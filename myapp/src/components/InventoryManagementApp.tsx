@@ -8,18 +8,15 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { 
-  LoadingScreen, 
-  ErrorScreen, 
-  CyberPunkBackground,
-  ProductCard,
-  InventoryHeader,
-  CategoryFilter,
-  SearchBar,
-  EmptyInventoryState,
-  ProductForm,
-  ActionButton,
-} from '../components';
+import { LoadingScreen, ErrorScreen } from './StateComponents';
+import { CyberPunkBackground } from './CyberPunkBackground';
+import { ProductCard } from './ProductCard';
+import { InventoryHeader } from './InventoryHeader';
+import { CategoryFilter } from './CategoryFilter';
+import { SearchBar } from './SearchBar';
+import { EmptyInventoryState } from './EmptyInventoryState';
+import { ProductForm } from './ProductForm';
+import { ActionButton } from './ActionButton';
 import { layoutStyles, inventoryStyles } from '../styles';
 import { useInventoryData } from '../hooks/useInventoryData';
 import { useAuth } from '../hooks/useAuth';

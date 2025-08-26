@@ -1,37 +1,21 @@
-// Simple JWT implementation for mock authentication
+// Simple JWT implementation for mock authentication using React Native compatible crypto
 // This creates tokens that the backend will accept
+
+import * as CryptoJS from 'crypto-js';
 
 const JWT_SECRET = 'your_jwt_secret'; // Same as backend
 
 // Base64 URL encode function
 function base64UrlEncode(obj: any): string {
   const jsonStr = JSON.stringify(obj);
-  const base64 = btoa(jsonStr);
+  const base64 = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(jsonStr));
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
-// Simple HMAC-SHA256 simulation (not cryptographically secure, but works for demo)
-async function simpleSign(data: string, secret: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(secret);
-  const dataToSign = encoder.encode(data);
-  
-  // Import key for HMAC
-  const key = await crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  
-  // Sign the data
-  const signature = await crypto.subtle.sign('HMAC', key, dataToSign);
-  
-  // Convert to base64url
-  const uint8Array = new Uint8Array(signature);
-  const bytes = Array.from(uint8Array);
-  const base64 = btoa(String.fromCharCode.apply(null, bytes));
+// HMAC-SHA256 signing using CryptoJS
+function simpleSign(data: string, secret: string): string {
+  const signature = CryptoJS.HmacSHA256(data, secret);
+  const base64 = CryptoJS.enc.Base64.stringify(signature);
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
@@ -53,7 +37,7 @@ export const jwtUtils = {
     const payloadEncoded = base64UrlEncode(tokenPayload);
     
     const dataToSign = `${headerEncoded}.${payloadEncoded}`;
-    const signature = await simpleSign(dataToSign, JWT_SECRET);
+    const signature = simpleSign(dataToSign, JWT_SECRET);
     
     return `${dataToSign}.${signature}`;
   }
