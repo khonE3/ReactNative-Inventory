@@ -36,6 +36,7 @@ export const fetchProducts = async (): Promise<Product[]> => {
     }
     const products = await response.json();
     console.log('Products fetched successfully:', products.length, 'items');
+    console.log('Sample product:', products[0]); // Debug: show first product
     return products;
   } catch (error) {
     console.error('Inventory API Error:', error);

@@ -46,7 +46,7 @@ export const InventoryManagementApp = () => {
 
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [formMode, setFormMode] = useState<'add' | 'edit' | 'view'>('add');
 
   const inventoryStats = getStockStatistics();
 
@@ -107,12 +107,17 @@ export const InventoryManagementApp = () => {
     );
   };
 
+  const handleViewProduct = (product: Product) => {
+    console.log('Viewing product:', product); // Debug log
+    setEditingProduct(product);
+    setFormMode('view');
+    setShowProductForm(true);
+  };
+
   const renderProductCard = ({ item }: { item: Product }) => (
     <ProductCard
       product={item}
-      onPress={() => {
-        console.log('Product selected:', item.name);
-      }}
+      onPress={() => handleViewProduct(item)}
       onEdit={handleEditProduct}
       onDelete={handleDeleteProduct}
     />
@@ -216,6 +221,7 @@ export const InventoryManagementApp = () => {
         onSubmit={handleProductFormSubmit}
         initialData={editingProduct}
         mode={formMode}
+        onEdit={handleEditProduct}
       />
     </SafeAreaView>
   );

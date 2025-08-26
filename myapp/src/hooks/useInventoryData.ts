@@ -17,6 +17,7 @@ export const useInventoryData = () => {
     try {
       setError(null);
       const data = await fetchProducts();
+      console.log('Fetched products data:', data); // Debug log
       setProducts(data);
       setFilteredProducts(data);
       setCategories(getUniqueCategories(data));

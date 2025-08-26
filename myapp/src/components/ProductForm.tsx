@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,8 @@ interface ProductFormProps {
   onClose: () => void;
   onSubmit: (data: ProductFormData) => Promise<void>;
   initialData?: Product | null;
-  mode: 'add' | 'edit';
+  mode: 'add' | 'edit' | 'view';
+  onEdit?: (product: Product) => void;
 }
 
 const categories = ['Electronics', 'Fashion', 'Home', 'Sports', 'Books', 'Food'];
@@ -30,6 +31,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onSubmit,
   initialData,
   mode,
+  onEdit,
 }) => {
   const [formData, setFormData] = useState<ProductFormData>({
     name: initialData?.name || '',
@@ -47,6 +49,43 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Update form data when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      console.log('ProductForm initialData:', initialData); // Debug log
+      setFormData({
+        name: initialData.name || '',
+        category: initialData.category || 'Electronics',
+        price: (initialData.price !== null && initialData.price !== undefined) ? initialData.price.toString() : '0',
+        unit: initialData.unit || 'ชิ้น',
+        image: initialData.image || '',
+        stock: (initialData.stock !== null && initialData.stock !== undefined) ? initialData.stock.toString() : '0',
+        location: initialData.location || '',
+        status: initialData.status || 'active',
+        brand: initialData.brand || '',
+        sizes: initialData.sizes || '',
+        productCode: initialData.productCode || '',
+        orderName: initialData.orderName || '',
+      });
+    } else {
+      // Reset form when no initialData
+      setFormData({
+        name: '',
+        category: 'Electronics',
+        price: '',
+        unit: 'ชิ้น',
+        image: '',
+        stock: '',
+        location: '',
+        status: 'active',
+        brand: '',
+        sizes: '',
+        productCode: '',
+        orderName: '',
+      });
+    }
+  }, [initialData]);
 
   const handleSubmit = async () => {
     // Validation
@@ -97,7 +136,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>
-              {mode === 'add' ? 'เพิ่มสินค้าใหม่' : 'แก้ไขสินค้า'}
+              {mode === 'add' ? 'เพิ่มสินค้าใหม่' : mode === 'edit' ? 'แก้ไขสินค้า' : 'รายละเอียดสินค้า'}
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>
@@ -108,11 +147,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <View style={styles.inputGroup}>
               <Text style={styles.label}>ชื่อสินค้า *</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, mode === 'view' && styles.disabledInput]}
                 value={formData.name}
-                onChangeText={(value) => updateField('name', value)}
+                onChangeText={(value) => mode !== 'view' && updateField('name', value)}
                 placeholder="กรอกชื่อสินค้า"
                 placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                editable={mode !== 'view'}
               />
             </View>
 
@@ -126,7 +166,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       styles.pickerOption,
                       formData.category === category && styles.pickerOptionSelected
                     ]}
-                    onPress={() => updateField('category', category)}
+                    onPress={() => mode !== 'view' && updateField('category', category)}
+                    disabled={mode === 'view'}
                   >
                     <Text style={[
                       styles.pickerOptionText,
@@ -143,12 +184,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <View style={styles.halfInput}>
                 <Text style={styles.label}>ราคา (บาท) *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, mode === 'view' && styles.disabledInput]}
                   value={formData.price}
-                  onChangeText={(value) => updateField('price', value)}
+                  onChangeText={(value) => mode !== 'view' && updateField('price', value)}
                   placeholder="0.00"
                   keyboardType="numeric"
                   placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                  editable={mode !== 'view'}
                 />
               </View>
               <View style={styles.halfInput}>
@@ -161,7 +203,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         styles.unitOption,
                         formData.unit === unit && styles.unitOptionSelected
                       ]}
-                      onPress={() => updateField('unit', unit)}
+                      onPress={() => mode !== 'view' && updateField('unit', unit)}
+                      disabled={mode === 'view'}
                     >
                       <Text style={[
                         styles.unitOptionText,
@@ -179,22 +222,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <View style={styles.halfInput}>
                 <Text style={styles.label}>จำนวนสต็อก *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, mode === 'view' && styles.disabledInput]}
                   value={formData.stock}
-                  onChangeText={(value) => updateField('stock', value)}
+                  onChangeText={(value) => mode !== 'view' && updateField('stock', value)}
                   placeholder="0"
                   keyboardType="numeric"
                   placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                  editable={mode !== 'view'}
                 />
               </View>
               <View style={styles.halfInput}>
                 <Text style={styles.label}>ตำแหน่ง</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, mode === 'view' && styles.disabledInput]}
                   value={formData.location}
-                  onChangeText={(value) => updateField('location', value)}
+                  onChangeText={(value) => mode !== 'view' && updateField('location', value)}
                   placeholder="เช่น A-001"
                   placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                  editable={mode !== 'view'}
                 />
               </View>
             </View>
@@ -202,55 +247,60 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             <View style={styles.inputGroup}>
               <Text style={styles.label}>แบรนด์</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, mode === 'view' && styles.disabledInput]}
                 value={formData.brand}
-                onChangeText={(value) => updateField('brand', value)}
+                onChangeText={(value) => mode !== 'view' && updateField('brand', value)}
                 placeholder="กรอกชื่อแบรนด์"
                 placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                editable={mode !== 'view'}
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>ขนาด/รุ่น</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, mode === 'view' && styles.disabledInput]}
                 value={formData.sizes}
-                onChangeText={(value) => updateField('sizes', value)}
+                onChangeText={(value) => mode !== 'view' && updateField('sizes', value)}
                 placeholder="เช่น S, M, L หรือ 128GB, 256GB"
                 placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                editable={mode !== 'view'}
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>รหัสสินค้า *</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, mode === 'view' && styles.disabledInput]}
                 value={formData.productCode}
-                onChangeText={(value) => updateField('productCode', value)}
+                onChangeText={(value) => mode !== 'view' && updateField('productCode', value)}
                 placeholder="เช่น IP15P-001"
                 placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                editable={mode !== 'view'}
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>ชื่อสำหรับออเดอร์</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, mode === 'view' && styles.disabledInput]}
                 value={formData.orderName}
-                onChangeText={(value) => updateField('orderName', value)}
+                onChangeText={(value) => mode !== 'view' && updateField('orderName', value)}
                 placeholder="ชื่อสินค้าแบบย่อ"
                 placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                editable={mode !== 'view'}
               />
             </View>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>URL รูปภาพ</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, mode === 'view' && styles.disabledInput]}
                 value={formData.image}
-                onChangeText={(value) => updateField('image', value)}
+                onChangeText={(value) => mode !== 'view' && updateField('image', value)}
                 placeholder="https://example.com/image.jpg"
                 placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                editable={mode !== 'view'}
               />
             </View>
 
@@ -264,7 +314,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       styles.statusOption,
                       formData.status === status && styles.statusOptionSelected
                     ]}
-                    onPress={() => updateField('status', status)}
+                    onPress={() => mode !== 'view' && updateField('status', status)}
+                    disabled={mode === 'view'}
                   >
                     <Text style={[
                       styles.statusOptionText,
@@ -285,17 +336,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               onPress={onClose}
               disabled={loading}
             >
-              <Text style={styles.cancelButtonText}>ยกเลิก</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-              onPress={handleSubmit}
-              disabled={loading}
-            >
-              <Text style={styles.submitButtonText}>
-                {loading ? 'กำลังบันทึก...' : mode === 'add' ? 'เพิ่มสินค้า' : 'บันทึกการแก้ไข'}
+              <Text style={styles.cancelButtonText}>
+                {mode === 'view' ? 'ปิด' : 'ยกเลิก'}
               </Text>
             </TouchableOpacity>
+            {mode === 'view' ? (
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => initialData && onEdit && onEdit(initialData)}
+              >
+                <Text style={styles.submitButtonText}>แก้ไข</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+                onPress={handleSubmit}
+                disabled={loading}
+              >
+                <Text style={styles.submitButtonText}>
+                  {loading ? 'กำลังบันทึก...' : mode === 'add' ? 'เพิ่มสินค้า' : 'บันทึกการแก้ไข'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
@@ -365,6 +427,11 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: CyberPunkTheme.colors.textPrimary,
+  },
+  disabledInput: {
+    backgroundColor: CyberPunkTheme.colors.surfaceLight,
+    borderColor: CyberPunkTheme.colors.textSecondary,
+    opacity: 0.7,
   },
   row: {
     flexDirection: 'row',
