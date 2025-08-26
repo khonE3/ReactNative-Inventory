@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { Product } from '../types';
 import { inventoryStyles } from '../styles/inventory';
 import { CyberPunkTheme } from '../constants/theme';
@@ -7,11 +7,18 @@ import { CyberPunkTheme } from '../constants/theme';
 interface ProductCardProps {
   product: Product;
   onPress?: () => void;
+  onEdit?: (product: Product) => void;
+  onDelete?: (productId: number) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ 
+  product, 
+  onPress, 
+  onEdit, 
+  onDelete 
+}) => {
   const isLowStock = product.stock <= 20;
-  const isActive = product.status === 'Active';
+  const isActive = product.status === 'active';
 
   const formatPrice = (price: number): string => {
     return price.toLocaleString('th-TH', { 
@@ -22,6 +29,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) =>
 
   const formatStock = (stock: number): string => {
     return stock.toLocaleString('th-TH');
+  };
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(product);
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'ยืนยันการลบ',
+      `คุณต้องการลบสินค้า "${product.name}" หรือไม่?`,
+      [
+        {
+          text: 'ยกเลิก',
+          style: 'cancel',
+        },
+        {
+          text: 'ลบ',
+          style: 'destructive',
+          onPress: () => {
+            if (onDelete) {
+              onDelete(product.id);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -111,6 +146,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onPress }) =>
           🏷️ {product.brand}
         </Text>
       </View>
+
+      {/* Action Buttons */}
+      {(onEdit || onDelete) && (
+        <View style={inventoryStyles.actionButtons}>
+          {onEdit && (
+            <TouchableOpacity 
+              style={inventoryStyles.editButton}
+              onPress={handleEdit}
+              activeOpacity={0.7}
+            >
+              <Text style={inventoryStyles.editButtonText}>✏️</Text>
+            </TouchableOpacity>
+          )}
+          {onDelete && (
+            <TouchableOpacity 
+              style={inventoryStyles.deleteButton}
+              onPress={handleDelete}
+              activeOpacity={0.7}
+            >
+              <Text style={inventoryStyles.deleteButtonText}>🗑️</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
     </TouchableOpacity>
   );
 };

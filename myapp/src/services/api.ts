@@ -1,16 +1,42 @@
 import { Product } from '../types';
+import { authService } from './auth';
 
-const BACKEND_URL = 'http://localhost:3006';
+// http://nindam.sytes.net:3006
+const BACKEND_URL = 'http://nindam.sytes.net:3006'; 
 const BASE_URL = 'http://nindam.sytes.net/std6630202015/Inventory';
+
+// Helper function to get headers with auth token
+const getHeaders = async (): Promise<HeadersInit> => {
+  const token = await authService.getToken();
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
+};
 
 // Inventory API Functions
 export const fetchProducts = async (): Promise<Product[]> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/products`);
+    console.log('Fetching products from:', `${BACKEND_URL}/api/products`);
+    const headers = await getHeaders();
+    const response = await fetch(`${BACKEND_URL}/api/products`, {
+      headers,
+    });
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch products');
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please login again.');
+      }
+      throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
     }
-    return await response.json();
+    const products = await response.json();
+    console.log('Products fetched successfully:', products.length, 'items');
+    return products;
   } catch (error) {
     console.error('Inventory API Error:', error);
     throw error;

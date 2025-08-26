@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { inventoryStyles } from '../styles/inventory';
+import { CyberPunkTheme } from '../constants';
 
 interface InventoryHeaderProps {
   totalProducts: number;
@@ -28,9 +29,13 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
     <View style={inventoryStyles.header}>
       <View style={inventoryStyles.headerGlow} />
       
-      <Text style={inventoryStyles.headerTitle}>
-        ระบบจัดการสินค้าไซเบอร์
-      </Text>
+      <View style={styles.headerTop}>
+        <View>
+          <Text style={inventoryStyles.headerTitle}>
+            ระบบจัดการสินค้าไซเบอร์
+          </Text>
+        </View>
+      </View>
       
       <View style={inventoryStyles.statsContainer}>
         <View style={inventoryStyles.statItem}>
@@ -64,3 +69,12 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+});

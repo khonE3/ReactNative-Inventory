@@ -324,6 +324,41 @@ export const inventoryStyles = StyleSheet.create({
   statusInactive: {
     backgroundColor: '#ff4757',
   },
+
+  // Action Buttons
+  actionButtons: {
+    flexDirection: 'row',
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    gap: 4,
+  },
+  editButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: CyberPunkTheme.colors.glass,
+    borderWidth: 1,
+    borderColor: CyberPunkTheme.colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  editButtonText: {
+    fontSize: 12,
+  },
+  deleteButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: CyberPunkTheme.colors.glass,
+    borderWidth: 1,
+    borderColor: CyberPunkTheme.colors.error,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    fontSize: 12,
+  },
 });
 
 export default inventoryStyles;

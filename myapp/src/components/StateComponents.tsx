@@ -17,7 +17,7 @@ interface ErrorScreenProps {
 
 export const ErrorScreen = ({ error, onRetry }: ErrorScreenProps) => (
   <View style={stateStyles.errorContainer}>
-    <Text style={stateStyles.errorText}>🔴 ระบบขัดข้อง: {error} </Text>
+    <Text style={stateStyles.errorText}>🔴 ระบบขัดข้อง: {error}</Text>
     <TouchableOpacity onPress={onRetry}>
       <Text style={stateStyles.retryText}>แตะเพื่อรีบูตระบบ 🔄</Text>
     </TouchableOpacity>

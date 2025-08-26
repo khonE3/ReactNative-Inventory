@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Product } from '../types';
+import { Product, ProductFormData } from '../types';
 import { fetchProducts, searchProducts, filterProductsByCategory, getUniqueCategories } from '../services/api';
 
 export const useInventoryData = () => {
@@ -81,6 +81,81 @@ export const useInventoryData = () => {
     };
   }, [products, getProductsByStatus, getLowStockProducts, getTotalInventoryValue]);
 
+  // Product CRUD operations (placeholder implementations)
+  const addProduct = useCallback(async (productData: ProductFormData) => {
+    try {
+      // In a real app, this would call an API to add the product
+      const newProduct: Product = {
+        id: Date.now(), // Generate temporary ID
+        name: productData.name,
+        category: productData.category,
+        price: parseFloat(productData.price) || 0,
+        unit: productData.unit,
+        image: productData.image,
+        stock: parseInt(productData.stock) || 0,
+        location: productData.location,
+        status: productData.status,
+        brand: productData.brand,
+        sizes: productData.sizes,
+        productCode: productData.productCode || `PRD${Date.now()}`,
+        orderName: productData.orderName,
+        lastUpdate: new Date().toISOString(),
+        storeAvailability: [],
+      };
+      
+      const updatedProducts = [...products, newProduct];
+      setProducts(updatedProducts);
+      setFilteredProducts(updatedProducts);
+      setCategories(getUniqueCategories(updatedProducts));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการเพิ่มสินค้า');
+    }
+  }, [products]);
+
+  const updateProduct = useCallback(async (id: number, productData: ProductFormData) => {
+    try {
+      // In a real app, this would call an API to update the product
+      const updatedProducts = products.map(product => 
+        product.id === id 
+          ? { 
+              ...product, 
+              name: productData.name,
+              category: productData.category,
+              price: parseFloat(productData.price) || product.price,
+              unit: productData.unit,
+              image: productData.image,
+              stock: parseInt(productData.stock) || product.stock,
+              location: productData.location,
+              status: productData.status,
+              brand: productData.brand,
+              sizes: productData.sizes,
+              productCode: productData.productCode || product.productCode,
+              orderName: productData.orderName,
+              lastUpdate: new Date().toISOString() 
+            }
+          : product
+      );
+      
+      setProducts(updatedProducts);
+      setFilteredProducts(updatedProducts);
+      setCategories(getUniqueCategories(updatedProducts));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการอัปเดตสินค้า');
+    }
+  }, [products]);
+
+  const deleteProduct = useCallback(async (id: number) => {
+    try {
+      // In a real app, this would call an API to delete the product
+      const updatedProducts = products.filter(product => product.id !== id);
+      setProducts(updatedProducts);
+      setFilteredProducts(updatedProducts);
+      setCategories(getUniqueCategories(updatedProducts));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า');
+    }
+  }, [products]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -99,6 +174,9 @@ export const useInventoryData = () => {
     fetchData,
     handleSearch,
     handleCategoryFilter,
+    addProduct,
+    updateProduct,
+    deleteProduct,
     getProductsByStatus,
     getLowStockProducts,
     getTotalInventoryValue,
