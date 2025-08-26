@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Product, ProductFormData } from '../types';
-import { fetchProducts, searchProducts, filterProductsByCategory, getUniqueCategories } from '../services/api';
+import { 
+  fetchProducts, 
+  searchProducts, 
+  filterProductsByCategory, 
+  getUniqueCategories,
+  createProduct,
+  updateProduct as updateProductAPI,
+  deleteProduct as deleteProductAPI
+} from '../services/api';
 
 export const useInventoryData = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,14 +21,40 @@ export const useInventoryData = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
+  // Validate and clean product data
+  const validateProduct = (product: any): Product => {
+    return {
+      id: product.id || 0,
+      name: product.name || 'ไม่ระบุชื่อ',
+      category: product.category || 'ไม่ระบุหมวดหมู่',
+      price: typeof product.price === 'number' ? product.price : 0,
+      unit: product.unit || 'ชิ้น',
+      image: product.image || '',
+      stock: typeof product.stock === 'number' ? product.stock : 0,
+      location: product.location || 'ไม่ระบุ',
+      status: product.status || 'active',
+      brand: product.brand || 'ไม่ระบุ',
+      sizes: product.sizes || '',
+      productCode: product.productCode || '',
+      orderName: product.orderName || '',
+      storeAvailability: product.storeAvailability || [],
+      lastUpdate: product.lastUpdate || new Date().toISOString(),
+    };
+  };
+
   const fetchData = useCallback(async () => {
     try {
       setError(null);
       const data = await fetchProducts();
       console.log('Fetched products data:', data); // Debug log
-      setProducts(data);
-      setFilteredProducts(data);
-      setCategories(getUniqueCategories(data));
+      
+      // Validate and clean data
+      const validatedProducts = data.map(validateProduct);
+      console.log('Validated products:', validatedProducts); // Debug log
+      
+      setProducts(validatedProducts);
+      setFilteredProducts(validatedProducts);
+      setCategories(getUniqueCategories(validatedProducts));
       setLastUpdated(new Date().toLocaleString('th-TH', {
         timeZone: 'Asia/Bangkok',
         year: 'numeric',
@@ -82,12 +116,13 @@ export const useInventoryData = () => {
     };
   }, [products, getProductsByStatus, getLowStockProducts, getTotalInventoryValue]);
 
-  // Product CRUD operations (placeholder implementations)
+  // Product CRUD operations
   const addProduct = useCallback(async (productData: ProductFormData) => {
     try {
-      // In a real app, this would call an API to add the product
-      const newProduct: Product = {
-        id: Date.now(), // Generate temporary ID
+      setError(null);
+      
+      // Call API to create product in database
+      const productToCreate = {
         name: productData.name,
         category: productData.category,
         price: parseFloat(productData.price) || 0,
@@ -100,62 +135,68 @@ export const useInventoryData = () => {
         sizes: productData.sizes,
         productCode: productData.productCode || `PRD${Date.now()}`,
         orderName: productData.orderName,
-        lastUpdate: new Date().toISOString(),
-        storeAvailability: [],
       };
       
-      const updatedProducts = [...products, newProduct];
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      setCategories(getUniqueCategories(updatedProducts));
+      const newProduct = await createProduct(productToCreate);
+      
+      // Refresh data from database to ensure consistency
+      await fetchData();
+      
+      console.log('Product added successfully:', newProduct);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการเพิ่มสินค้า');
+      throw err; // Re-throw for component error handling
     }
-  }, [products]);
+  }, [fetchData]);
 
   const updateProduct = useCallback(async (id: number, productData: ProductFormData) => {
     try {
-      // In a real app, this would call an API to update the product
-      const updatedProducts = products.map(product => 
-        product.id === id 
-          ? { 
-              ...product, 
-              name: productData.name,
-              category: productData.category,
-              price: parseFloat(productData.price) || product.price,
-              unit: productData.unit,
-              image: productData.image,
-              stock: parseInt(productData.stock) || product.stock,
-              location: productData.location,
-              status: productData.status,
-              brand: productData.brand,
-              sizes: productData.sizes,
-              productCode: productData.productCode || product.productCode,
-              orderName: productData.orderName,
-              lastUpdate: new Date().toISOString() 
-            }
-          : product
-      );
+      setError(null);
       
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      setCategories(getUniqueCategories(updatedProducts));
+      // Call API to update product in database
+      const productToUpdate = {
+        name: productData.name,
+        category: productData.category,
+        price: parseFloat(productData.price) || 0,
+        unit: productData.unit,
+        image: productData.image,
+        stock: parseInt(productData.stock) || 0,
+        location: productData.location,
+        status: productData.status,
+        brand: productData.brand,
+        sizes: productData.sizes,
+        productCode: productData.productCode,
+        orderName: productData.orderName,
+      };
+      
+      const updatedProduct = await updateProductAPI(id, productToUpdate);
+      
+      // Refresh data from database to ensure consistency
+      await fetchData();
+      
+      console.log('Product updated successfully:', updatedProduct);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการอัปเดตสินค้า');
+      throw err; // Re-throw for component error handling
     }
-  }, [products]);
+  }, [fetchData]);
 
   const deleteProduct = useCallback(async (id: number) => {
     try {
-      // In a real app, this would call an API to delete the product
-      const updatedProducts = products.filter(product => product.id !== id);
-      setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
-      setCategories(getUniqueCategories(updatedProducts));
+      setError(null);
+      
+      // Call API to delete product from database
+      await deleteProductAPI(id);
+      
+      // Refresh data from database to ensure consistency
+      await fetchData();
+      
+      console.log('Product deleted successfully:', id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า');
+      throw err; // Re-throw for component error handling
     }
-  }, [products]);
+  }, [fetchData]);
 
   useEffect(() => {
     fetchData();

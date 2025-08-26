@@ -17,17 +17,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onEdit, 
   onDelete 
 }) => {
-  const isLowStock = product.stock <= 20;
+  const isLowStock = (product.stock || 0) <= 20;
   const isActive = product.status === 'active';
 
-  const formatPrice = (price: number): string => {
+  const formatPrice = (price: number | undefined | null): string => {
+    if (price === undefined || price === null || isNaN(price)) {
+      return '0';
+    }
     return price.toLocaleString('th-TH', { 
       minimumFractionDigits: 0,
       maximumFractionDigits: 2 
     });
   };
 
-  const formatStock = (stock: number): string => {
+  const formatStock = (stock: number | undefined | null): string => {
+    if (stock === undefined || stock === null || isNaN(stock)) {
+      return '0';
+    }
     return stock.toLocaleString('th-TH');
   };
 

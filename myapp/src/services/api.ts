@@ -66,6 +66,84 @@ export const filterProductsByCategory = (products: Product[], category: string):
 };
 
 export const getUniqueCategories = (products: Product[]): string[] => {
-  const categories = products.map(product => product.category);
+  const categories = products
+    .map(product => product.category)
+    .filter(category => category && category.trim() !== ''); // Remove null, undefined, and empty strings
   return ['ทั้งหมด', ...Array.from(new Set(categories))];
+};
+
+// CRUD Operations for Products
+export const createProduct = async (productData: Partial<Product>): Promise<Product> => {
+  try {
+    console.log('Creating product:', productData);
+    const headers = await getHeaders();
+    const response = await fetch(`${BACKEND_URL}/api/products`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(productData),
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please login again.');
+      }
+      throw new Error(`Failed to create product: ${response.status} ${response.statusText}`);
+    }
+    
+    const newProduct = await response.json();
+    console.log('Product created successfully:', newProduct);
+    return newProduct;
+  } catch (error) {
+    console.error('Create Product API Error:', error);
+    throw error;
+  }
+};
+
+export const updateProduct = async (id: number, productData: Partial<Product>): Promise<Product> => {
+  try {
+    console.log('Updating product:', id, productData);
+    const headers = await getHeaders();
+    const response = await fetch(`${BACKEND_URL}/api/products/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(productData),
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please login again.');
+      }
+      throw new Error(`Failed to update product: ${response.status} ${response.statusText}`);
+    }
+    
+    const updatedProduct = await response.json();
+    console.log('Product updated successfully:', updatedProduct);
+    return updatedProduct;
+  } catch (error) {
+    console.error('Update Product API Error:', error);
+    throw error;
+  }
+};
+
+export const deleteProduct = async (id: number): Promise<void> => {
+  try {
+    console.log('Deleting product:', id);
+    const headers = await getHeaders();
+    const response = await fetch(`${BACKEND_URL}/api/products/${id}`, {
+      method: 'DELETE',
+      headers,
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Authentication required. Please login again.');
+      }
+      throw new Error(`Failed to delete product: ${response.status} ${response.statusText}`);
+    }
+    
+    console.log('Product deleted successfully');
+  } catch (error) {
+    console.error('Delete Product API Error:', error);
+    throw error;
+  }
 };

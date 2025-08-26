@@ -175,7 +175,7 @@ app.get('/api/products/:id', authToken, async (req, res) => {
 app.post('/api/products', authToken, async (req, res) => {
   try {
     const {
-      name, stock, category, location, image, status, brand, sizes, productCode, orderName
+      name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit
     } = req.body;
 
     if (!name) {
@@ -184,15 +184,22 @@ app.post('/api/products', authToken, async (req, res) => {
 
     const [rs] = await pool.query(
       `INSERT INTO products
-      (name, stock, category, location, image, status, brand, sizes, productCode, orderName, lastUpdate)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+      (name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit, lastUpdate)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [
         name, stock || 0, category || null, location || null,
         image || null, status || 'Active', brand || null, sizes || null, productCode || null,
-        orderName || null
+        orderName || null, price || 0, unit || null
       ]
     );
-    return res.status(201).json({ success: true, productId: rs.insertId });
+    
+    // Fetch the created product to return it
+    const [created] = await pool.query(
+      'SELECT * FROM products WHERE id = ?',
+      [rs.insertId]
+    );
+    
+    return res.status(201).json(created[0]);
   } catch (e) {
     console.error('Create Product Error:', e);
     return res.status(500).json({ error: 'Failed to create product' });
@@ -204,7 +211,7 @@ app.put('/api/products/:id', authToken, async (req, res) => {
   console.log('Received body:', req.body);
   try {
     const { id } = req.params;
-    const { name, stock, status, category, location, image, brand, sizes, productCode, orderName } = req.body;
+    const { name, stock, status, category, location, image, brand, sizes, productCode, orderName, price, unit } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
@@ -219,13 +226,20 @@ app.put('/api/products/:id', authToken, async (req, res) => {
     }
 
     await pool.query(
-      `UPDATE products SET name = ?, stock = ?, status = ?, category = ?, location = ?, image = ?, brand = ?, sizes = ?, productCode = ?, orderName = ?, lastUpdate = NOW() WHERE id = ?`,
+      `UPDATE products SET name = ?, stock = ?, status = ?, category = ?, location = ?, image = ?, brand = ?, sizes = ?, productCode = ?, orderName = ?, price = ?, unit = ?, lastUpdate = NOW() WHERE id = ?`,
       [
         name, stock || 0, status || 'Active', category || null, location || null,
-        image || null, brand || null, sizes || null, productCode || null, orderName || null, id
+        image || null, brand || null, sizes || null, productCode || null, orderName || null, price || 0, unit || null, id
       ]
     );
-    return res.json({ success: true, productId: id });
+    
+    // Fetch the updated product to return it
+    const [updated] = await pool.query(
+      'SELECT * FROM products WHERE id = ?',
+      [id]
+    );
+    
+    return res.json(updated[0]);
   } catch (e) {
     console.error('Update Product Error:', {
       message: e.message,

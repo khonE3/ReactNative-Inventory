@@ -20,9 +20,9 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={inventoryStyles.categoryScrollView}
       >
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <TouchableOpacity
-            key={category}
+            key={category || `category-${index}`} // Fallback key if category is empty
             style={[
               inventoryStyles.categoryButton,
               selectedCategory === category && inventoryStyles.categoryButtonActive

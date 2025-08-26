@@ -188,7 +188,7 @@ export const InventoryManagementApp = () => {
           </>
         }
         data={products}
-        keyExtractor={(item) => `product-${item.id}`}
+        keyExtractor={(item, index) => item.id ? `product-${item.id}` : `product-${index}`}
         renderItem={renderProductCard}
         numColumns={2}
         columnWrapperStyle={{ 
