@@ -359,6 +359,47 @@ export const inventoryStyles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 12,
   },
+
+  // Status and Update Info Styles
+  statusUpdateInfo: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: CyberPunkTheme.colors.primaryDark,
+  },
+  statusInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  statusLabel: {
+    fontSize: 11,
+    color: CyberPunkTheme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  statusValue: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    textShadowColor: CyberPunkTheme.colors.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 3,
+  },
+  updateInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  updateLabel: {
+    fontSize: 10,
+    color: CyberPunkTheme.colors.textSecondary,
+    fontWeight: '500',
+  },
+  updateValue: {
+    fontSize: 10,
+    color: CyberPunkTheme.colors.textSecondary,
+    fontStyle: 'italic',
+  },
 });
 
 export default inventoryStyles;

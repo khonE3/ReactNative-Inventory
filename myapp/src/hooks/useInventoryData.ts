@@ -23,14 +23,34 @@ export const useInventoryData = () => {
 
   // Validate and clean product data
   const validateProduct = (product: any): Product => {
+    // Helper function to convert price to number
+    const parsePrice = (price: any): number => {
+      if (typeof price === 'number') return price;
+      if (typeof price === 'string') {
+        const parsed = parseFloat(price);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
+    };
+
+    // Helper function to convert stock to number
+    const parseStock = (stock: any): number => {
+      if (typeof stock === 'number') return stock;
+      if (typeof stock === 'string') {
+        const parsed = parseInt(stock);
+        return isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
+    };
+
     return {
       id: product.id || 0,
       name: product.name || 'ไม่ระบุชื่อ',
       category: product.category || 'ไม่ระบุหมวดหมู่',
-      price: typeof product.price === 'number' ? product.price : 0,
+      price: parsePrice(product.price),
       unit: product.unit || 'ชิ้น',
       image: product.image || '',
-      stock: typeof product.stock === 'number' ? product.stock : 0,
+      stock: parseStock(product.stock),
       location: product.location || 'ไม่ระบุ',
       status: product.status || 'active',
       brand: product.brand || 'ไม่ระบุ',
@@ -48,9 +68,23 @@ export const useInventoryData = () => {
       const data = await fetchProducts();
       console.log('Fetched products data:', data); // Debug log
       
+      // Log sample raw product data from API
+      if (data.length > 0) {
+        console.log('Raw product sample:', data[0]);
+        console.log('Raw price type:', typeof data[0].price, 'value:', data[0].price);
+        console.log('Raw stock type:', typeof data[0].stock, 'value:', data[0].stock);
+      }
+      
       // Validate and clean data
       const validatedProducts = data.map(validateProduct);
       console.log('Validated products:', validatedProducts); // Debug log
+      
+      // Log sample validated product data
+      if (validatedProducts.length > 0) {
+        console.log('Validated product sample:', validatedProducts[0]);
+        console.log('Validated price type:', typeof validatedProducts[0].price, 'value:', validatedProducts[0].price);
+        console.log('Validated stock type:', typeof validatedProducts[0].stock, 'value:', validatedProducts[0].stock);
+      }
       
       setProducts(validatedProducts);
       setFilteredProducts(validatedProducts);

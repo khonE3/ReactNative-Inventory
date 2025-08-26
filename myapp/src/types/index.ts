@@ -3,10 +3,10 @@ export interface Product {
   id: number;
   name: string;
   category: string;
-  price: number;
+  price: number; // Always number after validation
   unit: string;
   image: string;
-  stock: number;
+  stock: number; // Always number after validation
   location: string;
   status: string;
   brand: string;
@@ -14,7 +14,7 @@ export interface Product {
   productCode: string;
   orderName: string;
   storeAvailability: StoreAvailability[];
-  lastUpdate: string;
+  lastUpdate: string; // From database updated_at field
 }
 
 export interface StoreAvailability {

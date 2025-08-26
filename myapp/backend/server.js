@@ -143,10 +143,33 @@ app.post('/api/auth/login', async (req, res) => {
 // GET /api/products (fetch all products)
 app.get('/api/products', authToken, async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT * FROM products ORDER BY lastUpdate DESC'
-    );
-    return res.json(rows);
+    const [rows] = await pool.query(`
+      SELECT 
+        id, 
+        name, 
+        category, 
+        price, 
+        unit, 
+        image, 
+        stock, 
+        location, 
+        status, 
+        brand, 
+        productCode,
+        updated_at as lastUpdate,
+        created_at
+      FROM products 
+      ORDER BY updated_at DESC
+    `);
+    
+    // Ensure price is a number
+    const products = rows.map(product => ({
+      ...product,
+      price: parseFloat(product.price) || 0,
+      stock: parseInt(product.stock) || 0
+    }));
+    
+    return res.json(products);
   } catch (e) {
     console.error('Products Error:', e);
     return res.status(500).json({ error: 'Failed to fetch products' });
