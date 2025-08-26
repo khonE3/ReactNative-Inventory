@@ -8,7 +8,9 @@ import {
   ScrollView,
   Alert,
   Modal,
+  Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { CyberPunkTheme } from '../constants';
 import { ProductFormData, Product } from '../types';
 
@@ -21,9 +23,34 @@ interface ProductFormProps {
   onEdit?: (product: Product) => void;
 }
 
-const categories = ['Electronics', 'Fashion', 'Home', 'Sports', 'Books', 'Food'];
-const statuses = ['active', 'inactive', 'discontinued'];
-const units = ['ชิ้น', 'คู่', 'กิโลกรัม', 'ลิตร', 'ชุด', 'แพ็ค'];
+const categories = [
+  { id: 'เครื่องดื่ม', name: 'เครื่องดื่ม', icon: '🥤' },
+  { id: 'ประกอบสำเร็จรูป', name: 'ประกอบสำเร็จรูป', icon: '🍜' },
+  { id: 'อาหารสด', name: 'อาหารสด', icon: '🥘' },
+  { id: 'ของแห้ง', name: 'ของแห้ง', icon: '🥜' },
+  { id: 'ของใช้ในบ้าน', name: 'ของใช้ในบ้าน', icon: '🏠' },
+  { id: 'ของใช้ส่วนตัว', name: 'ของใช้ส่วนตัว', icon: '🧴' },
+  { id: 'เบเกอรี่', name: 'เบเกอรี่', icon: '🍞' },
+  { id: 'ขนม', name: 'ขนม', icon: '🍪' },
+  { id: 'อื่นๆ', name: 'อื่นๆ', icon: '📦' }
+];
+
+const statuses = [
+  { id: 'active', name: 'ใช้งาน', icon: '✅', color: CyberPunkTheme.colors.success },
+  { id: 'inactive', name: 'ไม่ใช้งาน', icon: '⏸️', color: CyberPunkTheme.colors.warning },
+  { id: 'discontinued', name: 'ยกเลิก', icon: '❌', color: CyberPunkTheme.colors.error }
+];
+
+const units = [
+  { id: 'ชิ้น', name: 'ชิ้น', icon: '📦' },
+  { id: 'ขวด', name: 'ขวด', icon: '🍶' },
+  { id: 'ซอง', name: 'ซอง', icon: '📄' },
+  { id: 'กระป๋อง', name: 'กระป๋อง', icon: '🥫' },
+  { id: 'ถุง', name: 'ถุง', icon: '🛍️' },
+  { id: 'ห่อ', name: 'ห่อ', icon: '📦' },
+  { id: 'กิโลกรัม', name: 'กิโลกรัม', icon: '⚖️' },
+  { id: 'ลิตร', name: 'ลิตร', icon: '🥤' }
+];
 
 export const ProductForm: React.FC<ProductFormProps> = ({
   visible,
@@ -35,9 +62,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<ProductFormData>({
     name: initialData?.name || '',
-    category: initialData?.category || 'Electronics',
-    price: initialData?.price?.toString() || '',
-    unit: initialData?.unit || 'ชิ้น',
+        category: initialData?.category || 'เครื่องดื่ม',
+        price: initialData?.price?.toString() || '',
+        unit: initialData?.unit || 'ชิ้น',
     image: initialData?.image || '',
     stock: initialData?.stock?.toString() || '',
     location: initialData?.location || '',
@@ -56,7 +83,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       console.log('ProductForm initialData:', initialData); // Debug log
       setFormData({
         name: initialData.name || '',
-        category: initialData.category || 'Electronics',
+        category: initialData.category || 'เครื่องดื่ม',
         price: (initialData.price !== null && initialData.price !== undefined) ? initialData.price.toString() : '0',
         unit: initialData.unit || 'ชิ้น',
         image: initialData.image || '',
@@ -72,7 +99,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       // Reset form when no initialData
       setFormData({
         name: '',
-        category: 'Electronics',
+        category: 'เครื่องดื่ม',
         price: '',
         unit: 'ชิ้น',
         image: '',
@@ -132,16 +159,30 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>
-              {mode === 'add' ? 'เพิ่มสินค้าใหม่' : mode === 'edit' ? 'แก้ไขสินค้า' : 'รายละเอียดสินค้า'}
-            </Text>
+      <LinearGradient
+        colors={['rgba(0,0,0,0.4)', 'rgba(0,0,0,0.8)', 'rgba(0,0,0,0.9)']}
+        style={styles.modalOverlay}
+      >
+        <LinearGradient
+          colors={[CyberPunkTheme.colors.surface, CyberPunkTheme.colors.background]}
+          style={styles.modalContent}
+        >
+          <LinearGradient
+            colors={[CyberPunkTheme.colors.primary + '20', CyberPunkTheme.colors.primary + '10']}
+            style={styles.header}
+          >
+            <View style={styles.headerContent}>
+              <Text style={styles.headerIcon}>
+                {mode === 'add' ? '➕' : mode === 'edit' ? '✏️' : '👁️'}
+              </Text>
+              <Text style={styles.headerTitle}>
+                {mode === 'add' ? 'เพิ่มสินค้าใหม่' : mode === 'edit' ? 'แก้ไขสินค้า' : 'รายละเอียดสินค้า'}
+              </Text>
+            </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
 
           <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
             <View style={styles.inputGroup}>
@@ -158,26 +199,32 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>หมวดหมู่</Text>
-              <View style={styles.pickerContainer}>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false} 
+                style={styles.horizontalPicker}
+                contentContainerStyle={styles.pickerContainer}
+              >
                 {categories.map((category) => (
                   <TouchableOpacity
-                    key={category}
+                    key={category.id}
                     style={[
                       styles.pickerOption,
-                      formData.category === category && styles.pickerOptionSelected
+                      formData.category === category.id && styles.pickerOptionSelected
                     ]}
-                    onPress={() => mode !== 'view' && updateField('category', category)}
+                    onPress={() => mode !== 'view' && updateField('category', category.id)}
                     disabled={mode === 'view'}
                   >
+                    <Text style={styles.pickerIcon}>{category.icon}</Text>
                     <Text style={[
                       styles.pickerOptionText,
-                      formData.category === category && styles.pickerOptionTextSelected
+                      formData.category === category.id && styles.pickerOptionTextSelected
                     ]}>
-                      {category}
+                      {category.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </View>
+              </ScrollView>
             </View>
 
             <View style={styles.row}>
@@ -195,26 +242,32 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </View>
               <View style={styles.halfInput}>
                 <Text style={styles.label}>หน่วย</Text>
-                <View style={styles.unitPicker}>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false} 
+                  style={styles.horizontalPicker}
+                  contentContainerStyle={styles.unitPicker}
+                >
                   {units.map((unit) => (
                     <TouchableOpacity
-                      key={unit}
+                      key={unit.id}
                       style={[
                         styles.unitOption,
-                        formData.unit === unit && styles.unitOptionSelected
+                        formData.unit === unit.id && styles.unitOptionSelected
                       ]}
-                      onPress={() => mode !== 'view' && updateField('unit', unit)}
+                      onPress={() => mode !== 'view' && updateField('unit', unit.id)}
                       disabled={mode === 'view'}
                     >
+                      <Text style={styles.unitIcon}>{unit.icon}</Text>
                       <Text style={[
                         styles.unitOptionText,
-                        formData.unit === unit && styles.unitOptionTextSelected
+                        formData.unit === unit.id && styles.unitOptionTextSelected
                       ]}>
-                        {unit}
+                        {unit.name}
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               </View>
             </View>
 
@@ -309,20 +362,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               <View style={styles.statusPicker}>
                 {statuses.map((status) => (
                   <TouchableOpacity
-                    key={status}
+                    key={status.id}
                     style={[
                       styles.statusOption,
-                      formData.status === status && styles.statusOptionSelected
+                      formData.status === status.id && styles.statusOptionSelected,
+                      { borderColor: status.color + '40' }
                     ]}
-                    onPress={() => mode !== 'view' && updateField('status', status)}
+                    onPress={() => mode !== 'view' && updateField('status', status.id)}
                     disabled={mode === 'view'}
                   >
+                    <Text style={styles.statusIcon}>{status.icon}</Text>
                     <Text style={[
                       styles.statusOptionText,
-                      formData.status === status && styles.statusOptionTextSelected
+                      formData.status === status.id && styles.statusOptionTextSelected,
+                      formData.status === status.id && { color: status.color }
                     ]}>
-                      {status === 'active' ? 'ใช้งาน' : 
-                       status === 'inactive' ? 'ไม่ใช้งาน' : 'ยกเลิก'}
+                      {status.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -330,7 +385,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             </View>
           </ScrollView>
 
-          <View style={styles.buttonContainer}>
+          <LinearGradient
+            colors={[CyberPunkTheme.colors.primary, CyberPunkTheme.colors.primary + '80']}
+            style={styles.buttonContainer}
+          >
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={onClose}
@@ -345,7 +403,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 style={styles.submitButton}
                 onPress={() => initialData && onEdit && onEdit(initialData)}
               >
-                <Text style={styles.submitButtonText}>แก้ไข</Text>
+                <Text style={styles.submitButtonText}>✏️ แก้ไข</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -354,13 +412,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 disabled={loading}
               >
                 <Text style={styles.submitButtonText}>
-                  {loading ? 'กำลังบันทึก...' : mode === 'add' ? 'เพิ่มสินค้า' : 'บันทึกการแก้ไข'}
+                  {loading ? '⏳ กำลังบันทึก...' : mode === 'add' ? '➕ เพิ่มสินค้า' : '💾 บันทึกการแก้ไข'}
                 </Text>
               </TouchableOpacity>
             )}
-          </View>
-        </View>
-      </View>
+          </LinearGradient>
+        </LinearGradient>
+      </LinearGradient>
     </Modal>
   );
 };
@@ -368,65 +426,84 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: CyberPunkTheme.colors.surface,
-    borderRadius: 16,
-    width: '90%',
+    borderRadius: 20,
+    width: '92%',
     maxHeight: '90%',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: CyberPunkTheme.colors.primary,
+    elevation: 10,
+    shadowColor: CyberPunkTheme.colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
     borderBottomWidth: 1,
-    borderBottomColor: CyberPunkTheme.colors.surfaceLight,
+    borderBottomColor: CyberPunkTheme.colors.primary + '30',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerIcon: {
+    fontSize: 24,
+    marginRight: 12,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: CyberPunkTheme.colors.textPrimary,
   },
   closeButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: CyberPunkTheme.colors.error,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 4,
   },
   closeButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   form: {
     padding: 20,
-    maxHeight: 400,
+    maxHeight: 420,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
     color: CyberPunkTheme.colors.textPrimary,
-    marginBottom: 8,
+    marginBottom: 12,
+    textShadowColor: CyberPunkTheme.colors.primary + '30',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   input: {
     backgroundColor: CyberPunkTheme.colors.background,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: CyberPunkTheme.colors.surfaceLight,
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
     color: CyberPunkTheme.colors.textPrimary,
+    elevation: 2,
   },
   disabledInput: {
     backgroundColor: CyberPunkTheme.colors.surfaceLight,
@@ -436,119 +513,155 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   halfInput: {
     flex: 0.48,
   },
+  horizontalPicker: {
+    maxHeight: 60,
+  },
   pickerContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
+    paddingRight: 16,
   },
   pickerOption: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
     backgroundColor: CyberPunkTheme.colors.background,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: CyberPunkTheme.colors.surfaceLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 2,
+    minWidth: 120,
   },
   pickerOptionSelected: {
     backgroundColor: CyberPunkTheme.colors.primary,
     borderColor: CyberPunkTheme.colors.primary,
+    elevation: 4,
+  },
+  pickerIcon: {
+    fontSize: 16,
+    marginRight: 8,
   },
   pickerOptionText: {
     fontSize: 14,
     color: CyberPunkTheme.colors.textSecondary,
+    fontWeight: '600',
   },
   pickerOptionTextSelected: {
     color: 'white',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   unitPicker: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
+    gap: 6,
+    paddingRight: 16,
   },
   unitOption: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
     backgroundColor: CyberPunkTheme.colors.background,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: CyberPunkTheme.colors.surfaceLight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 2,
+    minWidth: 80,
   },
   unitOptionSelected: {
     backgroundColor: CyberPunkTheme.colors.primary,
     borderColor: CyberPunkTheme.colors.primary,
+    elevation: 4,
+  },
+  unitIcon: {
+    fontSize: 12,
+    marginRight: 4,
   },
   unitOptionText: {
     fontSize: 12,
     color: CyberPunkTheme.colors.textSecondary,
+    fontWeight: '600',
   },
   unitOptionTextSelected: {
     color: 'white',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   statusPicker: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   statusOption: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 16,
+    borderRadius: 12,
     backgroundColor: CyberPunkTheme.colors.background,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: CyberPunkTheme.colors.surfaceLight,
     alignItems: 'center',
+    elevation: 2,
   },
   statusOptionSelected: {
     backgroundColor: CyberPunkTheme.colors.primary,
     borderColor: CyberPunkTheme.colors.primary,
+    elevation: 4,
+  },
+  statusIcon: {
+    fontSize: 16,
+    marginBottom: 4,
   },
   statusOptionText: {
     fontSize: 14,
     color: CyberPunkTheme.colors.textSecondary,
+    fontWeight: '600',
   },
   statusOptionTextSelected: {
     color: 'white',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
     padding: 20,
-    gap: 12,
+    gap: 16,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
     borderTopWidth: 1,
-    borderTopColor: CyberPunkTheme.colors.surfaceLight,
+    borderTopColor: CyberPunkTheme.colors.primary + '30',
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 16,
+    borderRadius: 12,
     backgroundColor: CyberPunkTheme.colors.surface,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: CyberPunkTheme.colors.surfaceLight,
     alignItems: 'center',
+    elevation: 3,
   },
   cancelButtonText: {
     fontSize: 16,
     color: CyberPunkTheme.colors.textSecondary,
+    fontWeight: '600',
   },
   submitButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: 16,
+    borderRadius: 12,
     backgroundColor: CyberPunkTheme.colors.primary,
     alignItems: 'center',
+    elevation: 4,
   },
   submitButtonDisabled: {
     opacity: 0.6,
+    elevation: 1,
   },
   submitButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: 'white',
   },
 });

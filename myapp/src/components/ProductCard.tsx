@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { Product } from '../types';
 import { inventoryStyles } from '../styles/inventory';
 import { CyberPunkTheme } from '../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ProductCardProps {
   product: Product;
@@ -116,67 +117,89 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <TouchableOpacity 
-      style={inventoryStyles.productCard} 
+      style={[inventoryStyles.productCard, { elevation: 8, shadowOpacity: 0.3 }]} 
       onPress={onPress}
-      activeOpacity={0.8}
+      activeOpacity={0.9}
     >
-      {/* Glow Effect */}
-      <View style={inventoryStyles.productGlow} />
+      {/* Enhanced Glow Effect */}
+      <LinearGradient
+        colors={[
+          CyberPunkTheme.colors.primary + '20',
+          CyberPunkTheme.colors.primary + '05',
+          'transparent'
+        ]}
+        style={inventoryStyles.productGlow}
+      />
       
-      {/* Status Indicator */}
+      {/* Status Indicator with pulse animation */}
       <View 
         style={[
           inventoryStyles.statusIndicator,
-          isActive ? inventoryStyles.statusActive : inventoryStyles.statusInactive
+          isActive ? 
+            { backgroundColor: CyberPunkTheme.colors.success, shadowColor: CyberPunkTheme.colors.success, shadowOpacity: 0.6, shadowRadius: 4 } : 
+            { backgroundColor: CyberPunkTheme.colors.error, shadowColor: CyberPunkTheme.colors.error, shadowOpacity: 0.6, shadowRadius: 4 }
         ]} 
       />
 
-      {/* Low Stock Warning */}
+      {/* Enhanced Low Stock Warning */}
       {isLowStock && (
-        <View style={inventoryStyles.lowStockWarning}>
-          <Text style={inventoryStyles.lowStockText}>สต็อกต่ำ!</Text>
-        </View>
+        <LinearGradient
+          colors={[CyberPunkTheme.colors.warning, CyberPunkTheme.colors.warning + '80']}
+          style={[inventoryStyles.lowStockWarning, { borderRadius: 8, elevation: 4 }]}
+        >
+          <Text style={[inventoryStyles.lowStockText, { fontSize: 11, fontWeight: 'bold' }]}>
+            ⚠️ สต็อกต่ำ!
+          </Text>
+        </LinearGradient>
       )}
 
-      {/* Product Image */}
-      <View style={inventoryStyles.imageContainer}>
+      {/* Enhanced Product Image */}
+      <View style={[inventoryStyles.imageContainer, { elevation: 4, borderRadius: 12 }]}>
         {product.image ? (
           <Image 
             source={{ uri: product.image }}
-            style={inventoryStyles.productImage}
+            style={[inventoryStyles.productImage, { borderRadius: 10 }]}
             resizeMode="cover"
           />
         ) : (
-          <View style={inventoryStyles.productImagePlaceholder}>
-            <Text style={inventoryStyles.placeholderText}>📦</Text>
-          </View>
+          <LinearGradient
+            colors={[CyberPunkTheme.colors.surfaceLight, CyberPunkTheme.colors.surface]}
+            style={[inventoryStyles.productImagePlaceholder, { borderRadius: 10 }]}
+          >
+            <Text style={[inventoryStyles.placeholderText, { fontSize: 32 }]}>📦</Text>
+          </LinearGradient>
         )}
       </View>
 
-      {/* Product Info */}
+      {/* Enhanced Product Info */}
       <View style={inventoryStyles.productInfo}>
-        <Text style={inventoryStyles.productName} numberOfLines={2}>
+        <Text style={[inventoryStyles.productName, { fontSize: 16, fontWeight: 'bold' }]} numberOfLines={2}>
           {product.name}
         </Text>
         
-        <Text style={inventoryStyles.productCode}>
-          รหัส: {product.productCode}
-        </Text>
-        
-        <View style={inventoryStyles.categoryBadge}>
-          <Text style={inventoryStyles.categoryText}>
-            {product.category}
+        <View style={{ backgroundColor: CyberPunkTheme.colors.primary + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, marginVertical: 4, alignSelf: 'flex-start' }}>
+          <Text style={[inventoryStyles.productCode, { fontSize: 11, color: CyberPunkTheme.colors.primary, fontWeight: '600' }]}>
+            {product.productCode}
           </Text>
         </View>
+        
+        <LinearGradient
+          colors={[CyberPunkTheme.colors.primary + '30', CyberPunkTheme.colors.primary + '15']}
+          style={[inventoryStyles.categoryBadge, { borderRadius: 12, borderWidth: 1, borderColor: CyberPunkTheme.colors.primary + '40' }]}
+        >
+          <Text style={[inventoryStyles.categoryText, { fontWeight: '600' }]}>
+            🏷️ {product.category}
+          </Text>
+        </LinearGradient>
       </View>
 
-      {/* Price and Stock */}
-      <View style={inventoryStyles.bottomInfo}>
+      {/* Enhanced Price and Stock */}
+      <View style={[inventoryStyles.bottomInfo, { backgroundColor: CyberPunkTheme.colors.surface + '80', borderRadius: 8, margin: 8, padding: 8, elevation: 2 }]}>
         <View style={inventoryStyles.priceSection}>
-          <Text style={inventoryStyles.productPrice}>
+          <Text style={[inventoryStyles.productPrice, { fontSize: 18, fontWeight: 'bold', color: CyberPunkTheme.colors.primary }]}>
             ฿{formatPrice(product.price)}
           </Text>
-          <Text style={inventoryStyles.productUnit}>
+          <Text style={[inventoryStyles.productUnit, { fontSize: 11 }]}>
             ต่อ {product.unit}
           </Text>
         </View>
@@ -184,62 +207,95 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <View style={inventoryStyles.stockSection}>
           <Text style={[
             inventoryStyles.productStock,
-            { color: isLowStock ? CyberPunkTheme.colors.error : CyberPunkTheme.colors.success }
+            { 
+              fontSize: 16, 
+              fontWeight: 'bold',
+              color: isLowStock ? CyberPunkTheme.colors.error : CyberPunkTheme.colors.success 
+            }
           ]}>
             {formatStock(product.stock)}
           </Text>
-          <Text style={inventoryStyles.stockLabel}>คงเหลือ</Text>
+          <Text style={[inventoryStyles.stockLabel, { fontSize: 11 }]}>คงเหลือ</Text>
         </View>
       </View>
 
-      {/* Location and Brand */}
-      <View style={inventoryStyles.additionalInfo}>
-        <Text style={inventoryStyles.locationText}>
-          📍 {product.location}
-        </Text>
-        <Text style={inventoryStyles.brandText}>
-          🏷️ {product.brand}
-        </Text>
-      </View>
-
-      {/* Status and Last Update */}
-      <View style={inventoryStyles.statusUpdateInfo}>
-        <View style={inventoryStyles.statusInfo}>
-          <Text style={inventoryStyles.statusLabel}>สถานะ:</Text>
-          <Text style={[
-            inventoryStyles.statusValue,
-            { color: getStatusColor(product.status) }
-          ]}>
-            {getStatusText(product.status)}
+      {/* Enhanced Location and Brand */}
+      <View style={[inventoryStyles.additionalInfo, { backgroundColor: CyberPunkTheme.colors.surfaceLight + '50', borderRadius: 6, margin: 8, padding: 6 }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+          <Text style={[inventoryStyles.locationText, { fontSize: 11, flex: 1 }]}>
+            📍 {product.location}
           </Text>
         </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={[inventoryStyles.brandText, { fontSize: 11, flex: 1 }]}>
+            � {product.brand}
+          </Text>
+        </View>
+      </View>
+
+      {/* Enhanced Status and Last Update */}
+      <View style={[inventoryStyles.statusUpdateInfo, { backgroundColor: CyberPunkTheme.colors.background + '80', borderRadius: 6, margin: 8, padding: 6 }]}>
+        <View style={[inventoryStyles.statusInfo, { marginBottom: 2 }]}>
+          <Text style={[inventoryStyles.statusLabel, { fontSize: 10, fontWeight: '600' }]}>สถานะ:</Text>
+          <View style={{ 
+            backgroundColor: getStatusColor(product.status) + '20', 
+            paddingHorizontal: 6, 
+            paddingVertical: 1, 
+            borderRadius: 4, 
+            borderWidth: 1, 
+            borderColor: getStatusColor(product.status) + '40' 
+          }}>
+            <Text style={[
+              inventoryStyles.statusValue,
+              { color: getStatusColor(product.status), fontSize: 10, fontWeight: 'bold' }
+            ]}>
+              {getStatusText(product.status)}
+            </Text>
+          </View>
+        </View>
         <View style={inventoryStyles.updateInfo}>
-          <Text style={inventoryStyles.updateLabel}>อัปเดต:</Text>
-          <Text style={inventoryStyles.updateValue}>
+          <Text style={[inventoryStyles.updateLabel, { fontSize: 9 }]}>อัปเดต:</Text>
+          <Text style={[inventoryStyles.updateValue, { fontSize: 9 }]}>
             {formatLastUpdate(product.lastUpdate)}
           </Text>
         </View>
       </View>
 
-      {/* Action Buttons */}
+      {/* Enhanced Action Buttons */}
       {(onEdit || onDelete) && (
-        <View style={inventoryStyles.actionButtons}>
+        <View style={[inventoryStyles.actionButtons, { backgroundColor: CyberPunkTheme.colors.surface, borderRadius: 8, margin: 8, padding: 4, elevation: 2 }]}>
           {onEdit && (
             <TouchableOpacity 
-              style={inventoryStyles.editButton}
+              style={[inventoryStyles.editButton, { 
+                backgroundColor: CyberPunkTheme.colors.primary,
+                borderRadius: 6,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                elevation: 2
+              }]}
               onPress={handleEdit}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              <Text style={inventoryStyles.editButtonText}>✏️</Text>
+              <Text style={[inventoryStyles.editButtonText, { fontSize: 12, fontWeight: 'bold', color: 'white' }]}>
+                ✏️ แก้ไข
+              </Text>
             </TouchableOpacity>
           )}
           {onDelete && (
             <TouchableOpacity 
-              style={inventoryStyles.deleteButton}
+              style={[inventoryStyles.deleteButton, { 
+                backgroundColor: CyberPunkTheme.colors.error,
+                borderRadius: 6,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                elevation: 2
+              }]}
               onPress={handleDelete}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
-              <Text style={inventoryStyles.deleteButtonText}>🗑️</Text>
+              <Text style={[inventoryStyles.deleteButtonText, { fontSize: 12, fontWeight: 'bold', color: 'white' }]}>
+                🗑️ ลบ
+              </Text>
             </TouchableOpacity>
           )}
         </View>

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import { CyberPunkTheme } from '../constants/theme';
+import { CyberPunkBackground } from './CyberPunkBackground';
 
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
@@ -40,6 +41,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister }) 
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      <CyberPunkBackground />
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>เข้าสู่ระบบ</Text>
@@ -97,6 +99,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister }) 
             <Text style={styles.switchButtonText}>
               ยังไม่มีบัญชี? <Text style={styles.switchButtonTextHighlight}>สร้างบัญชีใหม่</Text>
             </Text>
+  
+             <Text style={styles.switchButtonText}>
+              admin <Text style={styles.switchButtonTextHighlight}>123456</Text>
+            </Text>
+
           </TouchableOpacity>
         </View>
       </View>
