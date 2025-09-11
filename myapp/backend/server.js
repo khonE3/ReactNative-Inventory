@@ -76,6 +76,30 @@ app.get('/api/ping', async (req, res) => {
   }
 });
 
+// Check database schema
+app.get('/api/check-schema', async (req, res) => {
+  try {
+    const [columns] = await pool.query('DESCRIBE products');
+    const [autoIncrementInfo] = await pool.query(`
+      SELECT AUTO_INCREMENT 
+      FROM information_schema.tables 
+      WHERE table_schema = DATABASE() 
+      AND table_name = 'products'
+    `);
+    
+    return res.json({
+      columns: columns,
+      autoIncrement: autoIncrementInfo[0]?.AUTO_INCREMENT || 'Not set',
+      recommendations: {
+        needsAutoIncrement: !columns.find(col => col.Field === 'id')?.Extra?.includes('auto_increment'),
+        sqlFix: 'ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT;'
+      }
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
+
 // ---------- Auth ----------
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -140,6 +164,107 @@ app.post('/api/auth/login', async (req, res) => {
 
 // ---------- Products CRUD (Enhanced) ----------
 
+// GET /api/categories (ดึงรายการ categories ทั้งหมด)
+app.get('/api/categories', authToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT DISTINCT category 
+      FROM products 
+      WHERE category IS NOT NULL AND category != ''
+      ORDER BY category ASC
+    `);
+    
+    const categories = ['ทั้งหมด', ...rows.map(row => row.category)];
+    console.log('✅ Categories fetched:', categories.length);
+    return res.json(categories);
+  } catch (e) {
+    console.error('❌ Categories Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถดึงข้อมูล categories ได้' });
+  }
+});
+
+// GET /api/products/search/:query (ค้นหาสินค้า)
+app.get('/api/products/search/:query', authToken, async (req, res) => {
+  try {
+    const { query } = req.params;
+    console.log('🔍 Searching products with query:', query);
+    
+    const [rows] = await pool.query(`
+      SELECT 
+        id, name, category, price, unit, image, stock, location, 
+        status, brand, sizes, productCode, orderName, lastUpdate
+      FROM products 
+      WHERE 
+        name LIKE ? OR 
+        category LIKE ? OR 
+        brand LIKE ? OR 
+        productCode LIKE ? OR
+        location LIKE ?
+      ORDER BY lastUpdate DESC
+    `, [
+      `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`
+    ]);
+    
+    const products = rows.map(product => ({
+      ...product,
+      price: parseFloat(product.price) || 0,
+      stock: parseInt(product.stock) || 0,
+      storeAvailability: []
+    }));
+    
+    console.log('✅ Found', products.length, 'products for query:', query);
+    return res.json(products);
+  } catch (e) {
+    console.error('❌ Search Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถค้นหาสินค้าได้' });
+  }
+});
+
+// GET /api/products/category/:category (ดึงสินค้าตาม category)
+app.get('/api/products/category/:category', authToken, async (req, res) => {
+  try {
+    let { category } = req.params;
+    console.log('📂 Fetching products by category:', category);
+    
+    let query, params;
+    if (category === 'ทั้งหมด' || category === 'all') {
+      query = `
+        SELECT 
+          id, name, category, price, unit, image, stock, location, 
+          status, brand, sizes, productCode, orderName, lastUpdate
+        FROM products 
+        ORDER BY lastUpdate DESC
+      `;
+      params = [];
+    } else {
+      query = `
+        SELECT 
+          id, name, category, price, unit, image, stock, location, 
+          status, brand, sizes, productCode, orderName, lastUpdate
+        FROM products 
+        WHERE category = ?
+        ORDER BY lastUpdate DESC
+      `;
+      params = [category];
+    }
+    
+    const [rows] = await pool.query(query, params);
+    
+    const products = rows.map(product => ({
+      ...product,
+      price: parseFloat(product.price) || 0,
+      stock: parseInt(product.stock) || 0,
+      storeAvailability: []
+    }));
+    
+    console.log('✅ Found', products.length, 'products in category:', category);
+    return res.json(products);
+  } catch (e) {
+    console.error('❌ Category Filter Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถดึงสินค้าตาม category ได้' });
+  }
+});
+
 // GET /api/products (fetch all products)
 app.get('/api/products', authToken, async (req, res) => {
   try {
@@ -155,20 +280,24 @@ app.get('/api/products', authToken, async (req, res) => {
         location, 
         status, 
         brand, 
+        sizes,
         productCode,
-        updated_at as lastUpdate,
-        created_at
+        orderName,
+        lastUpdate
       FROM products 
-      ORDER BY updated_at DESC
+      ORDER BY lastUpdate DESC
     `);
     
-    // Ensure price is a number
+    // Ensure price and stock are numbers
     const products = rows.map(product => ({
       ...product,
       price: parseFloat(product.price) || 0,
-      stock: parseInt(product.stock) || 0
+      stock: parseInt(product.stock) || 0,
+      // Add default storeAvailability for frontend compatibility
+      storeAvailability: []
     }));
     
+    console.log(`✅ Fetched ${products.length} products successfully`);
     return res.json(products);
   } catch (e) {
     console.error('Products Error:', e);
@@ -176,128 +305,422 @@ app.get('/api/products', authToken, async (req, res) => {
   }
 });
 
-// GET /api/products/:id (fetch single product)
+// GET /api/products/:id (ดึงข้อมูลสินค้าตัวเดียว)
 app.get('/api/products/:id', authToken, async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('🔍 Fetching product ID:', id);
+    
     const [rows] = await pool.query(
-      'SELECT * FROM products WHERE id = ?',
+      `SELECT 
+        id, name, category, price, unit, image, stock, location, 
+        status, brand, sizes, productCode, orderName, lastUpdate
+      FROM products WHERE id = ?`,
       [id]
     );
+    
     if (rows.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'ไม่พบสินค้าที่ต้องการ' });
     }
-    return res.json(rows[0]);
+    
+    const product = {
+      ...rows[0],
+      price: parseFloat(rows[0].price) || 0,
+      stock: parseInt(rows[0].stock) || 0,
+      storeAvailability: []
+    };
+    
+    console.log('✅ Product found:', product.name);
+    return res.json(product);
   } catch (e) {
-    console.error('Product Fetch Error:', e);
-    return res.status(500).json({ error: 'Failed to fetch product' });
+    console.error('❌ Product Fetch Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถดึงข้อมูลสินค้าได้' });
   }
 });
 
-// POST /api/products
+// POST /api/products (สร้างสินค้าใหม่)
 app.post('/api/products', authToken, async (req, res) => {
   try {
     const {
-      name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit
+      name, category, price, unit, image, stock, location, status, 
+      brand, sizes, productCode, orderName
     } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
+    // Validation
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ error: 'ชื่อสินค้าเป็นข้อมูลที่จำเป็น' });
     }
 
-    const [rs] = await pool.query(
-      `INSERT INTO products
-      (name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit, lastUpdate)
+    console.log('Creating new product:', { name, category, price, stock });
+
+    // Check if productCode already exists (if provided)
+    if (productCode && productCode.trim()) {
+      const [existingProduct] = await pool.query(
+        'SELECT id FROM products WHERE productCode = ?',
+        [productCode.trim()]
+      );
+      if (existingProduct.length > 0) {
+        return res.status(400).json({ error: 'รหัสสินค้านี้มีอยู่แล้ว กรุณาใช้รหัสอื่น' });
+      }
+    }
+
+    // Generate productCode if not provided
+    const finalProductCode = productCode && productCode.trim() 
+      ? productCode.trim() 
+      : `PRD${Date.now().toString().slice(-6)}`;
+
+    console.log('📝 Inserting product with data:', {
+      name: name.trim(),
+      category,
+      price: parseFloat(price) || 0,
+      stock: parseInt(stock) || 0,
+      productCode: finalProductCode
+    });
+
+    // INSERT ไม่ต้องใส่ id ให้ AUTO_INCREMENT ทำงาน
+    const [result] = await pool.query(
+      `INSERT INTO products 
+      (name, category, price, unit, image, stock, location, status, brand, sizes, productCode, orderName, lastUpdate)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
       [
-        name, stock || 0, category || null, location || null,
-        image || null, status || 'Active', brand || null, sizes || null, productCode || null,
-        orderName || null, price || 0, unit || null
+        name.trim(),
+        category || null,
+        parseFloat(price) || 0,
+        unit || null,
+        image || null,
+        parseInt(stock) || 0,
+        location || null,
+        status || 'Active',
+        brand || null,
+        sizes || null,
+        finalProductCode,
+        orderName || null
       ]
     );
     
-    // Fetch the created product to return it
+    console.log('✅ Product inserted, insertId:', result.insertId);
+    
+    // Fetch the created product
     const [created] = await pool.query(
-      'SELECT * FROM products WHERE id = ?',
-      [rs.insertId]
+      `SELECT 
+        id, name, category, price, unit, image, stock, location, 
+        status, brand, sizes, productCode, orderName, lastUpdate
+      FROM products WHERE id = ?`,
+      [result.insertId]
     );
     
-    return res.status(201).json(created[0]);
+    if (created.length === 0) {
+      throw new Error('ไม่สามารถดึงข้อมูลสินค้าที่สร้างได้');
+    }
+    
+    const newProduct = {
+      ...created[0],
+      price: parseFloat(created[0].price) || 0,
+      stock: parseInt(created[0].stock) || 0,
+      storeAvailability: []
+    };
+    
+    console.log('✅ Product created successfully:', newProduct.id);
+    return res.status(201).json(newProduct);
   } catch (e) {
-    console.error('Create Product Error:', e);
-    return res.status(500).json({ error: 'Failed to create product' });
+    console.error('❌ Create Product Error:', e);
+    
+    // Handle specific database errors
+    if (e.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'ข้อมูลซ้ำกัน: รหัสสินค้าหรือข้อมูลที่ต้องไม่ซ้ำมีอยู่แล้ว' });
+    } else if (e.code === 'ER_NO_DEFAULT_FOR_FIELD') {
+      return res.status(500).json({ 
+        error: 'ข้อผิดพลาดฐานข้อมูล: กรุณาตั้งค่า AUTO_INCREMENT ให้กับ field id ในตาราง products',
+        solution: 'รันคำสั่ง: ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT;'
+      });
+    } else if (e.code === 'ER_BAD_NULL_ERROR') {
+      return res.status(400).json({ error: 'ข้อมูลไม่ครบถ้วน: มีฟิลด์จำเป็นที่ยังไม่ได้กรอก' });
+    }
+    
+    return res.status(500).json({ error: 'ไม่สามารถสร้างสินค้าได้', details: e.message });
   }
 });
 
-// PUT /api/products/:id
+// PUT /api/products/:id (แก้ไขสินค้า)
 app.put('/api/products/:id', authToken, async (req, res) => {
-  console.log('Received body:', req.body);
+  console.log('🔄 Updating product ID:', req.params.id);
+  console.log('📝 Request body:', req.body);
+  
   try {
     const { id } = req.params;
-    const { name, stock, status, category, location, image, brand, sizes, productCode, orderName, price, unit } = req.body;
+    const { 
+      name, category, price, unit, image, stock, location, 
+      status, brand, sizes, productCode, orderName 
+    } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
+    // Validation
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ error: 'ชื่อสินค้าเป็นข้อมูลที่จำเป็น' });
     }
 
-    const [found] = await pool.query(
-      'SELECT id FROM products WHERE id = ?',
-      [id]
-    );
+    // Check if product exists
+    const [found] = await pool.query('SELECT id FROM products WHERE id = ?', [id]);
     if (found.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'ไม่พบสินค้าที่ต้องการแก้ไข' });
     }
 
+    // Update product
     await pool.query(
-      `UPDATE products SET name = ?, stock = ?, status = ?, category = ?, location = ?, image = ?, brand = ?, sizes = ?, productCode = ?, orderName = ?, price = ?, unit = ?, lastUpdate = NOW() WHERE id = ?`,
+      `UPDATE products SET 
+        name = ?, 
+        category = ?, 
+        price = ?, 
+        unit = ?, 
+        image = ?, 
+        stock = ?, 
+        location = ?, 
+        status = ?, 
+        brand = ?, 
+        sizes = ?, 
+        productCode = ?, 
+        orderName = ?, 
+        lastUpdate = NOW() 
+      WHERE id = ?`,
       [
-        name, stock || 0, status || 'Active', category || null, location || null,
-        image || null, brand || null, sizes || null, productCode || null, orderName || null, price || 0, unit || null, id
+        name.trim(),
+        category || null,
+        parseFloat(price) || 0,
+        unit || null,
+        image || null,
+        parseInt(stock) || 0,
+        location || null,
+        status || 'Active',
+        brand || null,
+        sizes || null,
+        productCode || null,
+        orderName || null,
+        id
       ]
     );
     
-    // Fetch the updated product to return it
+    // Fetch updated product
     const [updated] = await pool.query(
-      'SELECT * FROM products WHERE id = ?',
+      `SELECT 
+        id, name, category, price, unit, image, stock, location, 
+        status, brand, sizes, productCode, orderName, lastUpdate
+      FROM products WHERE id = ?`,
       [id]
     );
     
-    return res.json(updated[0]);
+    const updatedProduct = {
+      ...updated[0],
+      price: parseFloat(updated[0].price) || 0,
+      stock: parseInt(updated[0].stock) || 0,
+      storeAvailability: []
+    };
+    
+    console.log('✅ Product updated successfully:', id);
+    return res.json(updatedProduct);
   } catch (e) {
-    console.error('Update Product Error:', {
+    console.error('❌ Update Product Error:', {
       message: e.message,
-      stack: e.stack,
-      params: req.params,
-      body: req.body,
+      productId: req.params.id,
       time: new Date().toISOString(),
     });
-    return res.status(500).json({ error: 'Failed to update product', details: e.message });
+    return res.status(500).json({ error: 'ไม่สามารถแก้ไขสินค้าได้', details: e.message });
   }
 });
 
-// DELETE /api/products/:id
+// DELETE /api/products/:id (ลบสินค้า)
 app.delete('/api/products/:id', authToken, async (req, res) => {
-  console.log('Delete request for id:', req.params.id);
+  console.log('🗑️ Delete request for product ID:', req.params.id);
+  
   try {
     const { id } = req.params;
+    
+    // Check if product exists
     const [found] = await pool.query(
-      'SELECT id FROM products WHERE id = ?',
+      'SELECT id, name FROM products WHERE id = ?',
       [id]
     );
+    
     if (found.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+      return res.status(404).json({ error: 'ไม่พบสินค้าที่ต้องการลบ' });
     }
-    console.log('Attempting to delete product with id:', id);
+    
+    const productName = found[0].name;
+    console.log('🔄 Attempting to delete product:', productName);
+    
+    // Delete the product
     await pool.query('DELETE FROM products WHERE id = ?', [id]);
-    return res.json({ success: true, productId: id });
+    
+    console.log('✅ Product deleted successfully:', productName);
+    return res.json({ 
+      success: true, 
+      message: 'ลบสินค้าเรียบร้อยแล้ว', 
+      productId: parseInt(id),
+      productName: productName 
+    });
   } catch (e) {
-    console.error('Delete Product Error:', {
+    console.error('❌ Delete Product Error:', {
       message: e.message,
-      stack: e.stack,
-      params: req.params,
+      productId: req.params.id,
       time: new Date().toISOString(),
     });
-    return res.status(500).json({ error: 'Failed to delete product', details: e.message });
+    return res.status(500).json({ 
+      error: 'ไม่สามารถลบสินค้าได้', 
+      details: e.message 
+    });
+  }
+});
+
+// ---------- Bulk Operations ----------
+
+// POST /api/products/bulk-delete (ลบสินค้าหลายรายการ)
+app.post('/api/products/bulk-delete', authToken, async (req, res) => {
+  try {
+    const { productIds } = req.body;
+    
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ error: 'กรุณาระบุ ID สินค้าที่ต้องการลบ' });
+    }
+    
+    console.log('🗑️ Bulk delete request for products:', productIds);
+    
+    // Check which products exist
+    const placeholders = productIds.map(() => '?').join(',');
+    const [found] = await pool.query(
+      `SELECT id, name FROM products WHERE id IN (${placeholders})`,
+      productIds
+    );
+    
+    if (found.length === 0) {
+      return res.status(404).json({ error: 'ไม่พบสินค้าที่ต้องการลบ' });
+    }
+    
+    // Delete products
+    await pool.query(
+      `DELETE FROM products WHERE id IN (${placeholders})`,
+      productIds
+    );
+    
+    console.log('✅ Bulk deleted', found.length, 'products');
+    return res.json({
+      success: true,
+      message: `ลบสินค้าเรียบร้อยแล้ว ${found.length} รายการ`,
+      deletedCount: found.length,
+      deletedProducts: found
+    });
+  } catch (e) {
+    console.error('❌ Bulk Delete Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถลบสินค้าได้', details: e.message });
+  }
+});
+
+// PUT /api/products/bulk-update-status (อัปเดตสถานะสินค้าหลายรายการ)
+app.put('/api/products/bulk-update-status', authToken, async (req, res) => {
+  try {
+    const { productIds, status } = req.body;
+    
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ error: 'กรุณาระบุ ID สินค้าที่ต้องการอัปเดต' });
+    }
+    
+    if (!status) {
+      return res.status(400).json({ error: 'กรุณาระบุสถานะที่ต้องการ' });
+    }
+    
+    console.log('🔄 Bulk status update for products:', productIds, 'to status:', status);
+    
+    const placeholders = productIds.map(() => '?').join(',');
+    
+    // Update status
+    const [result] = await pool.query(
+      `UPDATE products SET status = ?, lastUpdate = NOW() WHERE id IN (${placeholders})`,
+      [status, ...productIds]
+    );
+    
+    console.log('✅ Bulk updated status for', result.affectedRows, 'products');
+    return res.json({
+      success: true,
+      message: `อัปเดตสถานะเรียบร้อยแล้ว ${result.affectedRows} รายการ`,
+      updatedCount: result.affectedRows,
+      newStatus: status
+    });
+  } catch (e) {
+    console.error('❌ Bulk Status Update Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถอัปเดตสถานะได้', details: e.message });
+  }
+});
+
+// ---------- Statistics & Analytics ----------
+
+// GET /api/stats/dashboard (สถิติหน้า dashboard)
+app.get('/api/stats/dashboard', authToken, async (req, res) => {
+  try {
+    console.log('📊 Fetching dashboard statistics');
+    
+    // Total products
+    const [totalResult] = await pool.query('SELECT COUNT(*) as total FROM products');
+    const totalProducts = totalResult[0].total;
+    
+    // Active products
+    const [activeResult] = await pool.query('SELECT COUNT(*) as active FROM products WHERE status = ?', ['Active']);
+    const activeProducts = activeResult[0].active;
+    
+    // Low stock products (stock < 10)
+    const [lowStockResult] = await pool.query('SELECT COUNT(*) as lowStock FROM products WHERE stock < ?', [10]);
+    const lowStockProducts = lowStockResult[0].lowStock;
+    
+    // Products by category
+    const [categoryStats] = await pool.query(`
+      SELECT category, COUNT(*) as count 
+      FROM products 
+      WHERE category IS NOT NULL AND category != ''
+      GROUP BY category 
+      ORDER BY count DESC
+    `);
+    
+    // Recent products (last 7 days)
+    const [recentResult] = await pool.query(`
+      SELECT COUNT(*) as recent 
+      FROM products 
+      WHERE lastUpdate >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+    `);
+    const recentProducts = recentResult[0].recent;
+    
+    const stats = {
+      totalProducts,
+      activeProducts,
+      lowStockProducts,
+      recentProducts,
+      categoryStats,
+      lastUpdated: new Date().toISOString()
+    };
+    
+    console.log('✅ Dashboard stats generated');
+    return res.json(stats);
+  } catch (e) {
+    console.error('❌ Dashboard Stats Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถดึงสถิติได้', details: e.message });
+  }
+});
+
+// GET /api/stats/low-stock (สินค้าที่เหลือน้อย)
+app.get('/api/stats/low-stock', authToken, async (req, res) => {
+  try {
+    const limit = req.query.limit || 10;
+    console.log('📉 Fetching low stock products, limit:', limit);
+    
+    const [rows] = await pool.query(`
+      SELECT 
+        id, name, category, stock, status, lastUpdate
+      FROM products 
+      WHERE stock < 10
+      ORDER BY stock ASC
+      LIMIT ?
+    `, [parseInt(limit)]);
+    
+    console.log('✅ Found', rows.length, 'low stock products');
+    return res.json(rows);
+  } catch (e) {
+    console.error('❌ Low Stock Error:', e);
+    return res.status(500).json({ error: 'ไม่สามารถดึงข้อมูลสินค้าที่เหลือน้อยได้' });
   }
 });
 

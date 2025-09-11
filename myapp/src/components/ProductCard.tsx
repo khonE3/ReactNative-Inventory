@@ -94,6 +94,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const handleDelete = () => {
+    console.log('🗑️ Delete button pressed for product:', product.id, product.name);
     Alert.alert(
       'ยืนยันการลบ',
       `คุณต้องการลบสินค้า "${product.name}" หรือไม่?`,
@@ -101,13 +102,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {
           text: 'ยกเลิก',
           style: 'cancel',
+          onPress: () => console.log('❌ Delete cancelled')
         },
         {
           text: 'ลบ',
           style: 'destructive',
           onPress: () => {
+            console.log('✅ Delete confirmed for product:', product.id);
             if (onDelete) {
+              console.log('📞 Calling onDelete function...');
               onDelete(product.id);
+            } else {
+              console.log('❌ onDelete function not available');
             }
           },
         },
@@ -290,7 +296,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 paddingVertical: 6,
                 elevation: 2
               }]}
-              onPress={handleDelete}
+              onPress={() => {
+                console.log('🗑️ Delete button touched!');
+                handleDelete();
+              }}
               activeOpacity={0.8}
             >
               <Text style={[inventoryStyles.deleteButtonText, { fontSize: 12, fontWeight: 'bold', color: 'white' }]}>
@@ -298,6 +307,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </Text>
             </TouchableOpacity>
           )}
+        </View>
+      )}
+      {/* Debug info */}
+      {__DEV__ && (
+        <View style={{ padding: 4, backgroundColor: 'rgba(255,255,255,0.1)', margin: 4 }}>
+          <Text style={{ color: 'white', fontSize: 10 }}>
+            Debug: onEdit={onEdit ? 'true' : 'false'}, onDelete={onDelete ? 'true' : 'false'}
+          </Text>
         </View>
       )}
     </TouchableOpacity>

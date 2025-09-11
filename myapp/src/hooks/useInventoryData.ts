@@ -216,17 +216,21 @@ export const useInventoryData = () => {
   }, [fetchData]);
 
   const deleteProduct = useCallback(async (id: number) => {
+    console.log('🗑️ useInventoryData: deleteProduct called with ID:', id);
     try {
       setError(null);
+      console.log('📞 Calling deleteProductAPI...');
       
       // Call API to delete product from database
       await deleteProductAPI(id);
       
+      console.log('✅ API call successful, refreshing data...');
       // Refresh data from database to ensure consistency
       await fetchData();
       
-      console.log('Product deleted successfully:', id);
+      console.log('✅ Product deleted successfully:', id);
     } catch (err) {
+      console.error('❌ Delete product error:', err);
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า');
       throw err; // Re-throw for component error handling
     }

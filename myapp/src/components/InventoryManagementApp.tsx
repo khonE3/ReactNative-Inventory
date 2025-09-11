@@ -63,10 +63,14 @@ export const InventoryManagementApp = () => {
   };
 
   const handleDeleteProduct = async (productId: number) => {
+    console.log('🔄 InventoryManagementApp: handleDeleteProduct called with ID:', productId);
     try {
+      console.log('📞 Calling deleteProduct function...');
       await deleteProduct(productId);
+      console.log('✅ Delete successful');
       Alert.alert('สำเร็จ', 'ลบสินค้าสำเร็จ');
     } catch (error) {
+      console.error('❌ Delete error:', error);
       Alert.alert('ข้อผิดพลาด', error instanceof Error ? error.message : 'เกิดข้อผิดพลาด');
     }
   };
@@ -114,14 +118,17 @@ export const InventoryManagementApp = () => {
     setShowProductForm(true);
   };
 
-  const renderProductCard = ({ item }: { item: Product }) => (
-    <ProductCard
-      product={item}
-      onPress={() => handleViewProduct(item)}
-      onEdit={handleEditProduct}
-      onDelete={handleDeleteProduct}
-    />
-  );
+  const renderProductCard = ({ item }: { item: Product }) => {
+    console.log('🎯 Rendering ProductCard for:', item.name, 'with onDelete:', !!handleDeleteProduct);
+    return (
+      <ProductCard
+        product={item}
+        onPress={() => handleViewProduct(item)}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteProduct}
+      />
+    );
+  };
 
   if (loading) {
     return (

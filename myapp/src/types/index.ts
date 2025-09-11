@@ -14,7 +14,7 @@ export interface Product {
   productCode: string;
   orderName: string;
   storeAvailability: StoreAvailability[];
-  lastUpdate: string; // From database updated_at field
+  lastUpdate: string; // From database lastUpdate field
 }
 
 export interface StoreAvailability {
