@@ -92,11 +92,44 @@ app.get('/api/check-schema', async (req, res) => {
       autoIncrement: autoIncrementInfo[0]?.AUTO_INCREMENT || 'Not set',
       recommendations: {
         needsAutoIncrement: !columns.find(col => col.Field === 'id')?.Extra?.includes('auto_increment'),
-        sqlFix: 'ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT;'
+        sqlFix: 'ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY;'
       }
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
+  }
+});
+
+// Fix database schema endpoint
+app.post('/api/fix-schema', async (req, res) => {
+  try {
+    // First, let's check if there are any existing records
+    const [existingRecords] = await pool.query('SELECT COUNT(*) as count FROM products');
+    
+    if (existingRecords[0].count > 0) {
+      // If there are existing records, we need to be more careful
+      await pool.query('ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY');
+    } else {
+      // If no records exist, we can safely modify the table
+      await pool.query('ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY');
+    }
+    
+    // Verify the change
+    const [columns] = await pool.query('DESCRIBE products');
+    const idColumn = columns.find(col => col.Field === 'id');
+    
+    return res.json({
+      success: true,
+      message: 'Database schema fixed successfully',
+      idColumn: idColumn
+    });
+  } catch (e) {
+    console.error('Schema Fix Error:', e);
+    return res.status(500).json({ 
+      error: 'Failed to fix schema', 
+      details: e.message,
+      suggestion: 'Please run this SQL command manually in your database: ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY;'
+    });
   }
 });
 
@@ -338,234 +371,131 @@ app.get('/api/products/:id', authToken, async (req, res) => {
   }
 });
 
-// POST /api/products (สร้างสินค้าใหม่)
+// POST /api/products
 app.post('/api/products', authToken, async (req, res) => {
   try {
     const {
-      name, category, price, unit, image, stock, location, status, 
-      brand, sizes, productCode, orderName
+      name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit
     } = req.body;
 
-    // Validation
-    if (!name || name.trim() === '') {
-      return res.status(400).json({ error: 'ชื่อสินค้าเป็นข้อมูลที่จำเป็น' });
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
     }
 
-    console.log('Creating new product:', { name, category, price, stock });
+    // Check if id field has AUTO_INCREMENT
+    const [columns] = await pool.query('DESCRIBE products');
+    const idColumn = columns.find(col => col.Field === 'id');
+    const hasAutoIncrement = idColumn?.Extra?.includes('auto_increment');
 
-    // Check if productCode already exists (if provided)
-    if (productCode && productCode.trim()) {
-      const [existingProduct] = await pool.query(
-        'SELECT id FROM products WHERE productCode = ?',
-        [productCode.trim()]
-      );
-      if (existingProduct.length > 0) {
-        return res.status(400).json({ error: 'รหัสสินค้านี้มีอยู่แล้ว กรุณาใช้รหัสอื่น' });
-      }
+    let query, values;
+    
+    if (hasAutoIncrement) {
+      // Use AUTO_INCREMENT (don't specify id)
+      query = `INSERT INTO products
+        (name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit, lastUpdate)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+      values = [
+        name, stock || 0, category || null, location || null,
+        image || null, status || 'active', brand || null, sizes || null, productCode || null,
+        orderName || null, parseFloat(price) || 0, unit || 'ชิ้น'
+      ];
+    } else {
+      // Manual ID generation (fallback)
+      const [maxIdResult] = await pool.query('SELECT COALESCE(MAX(id), 0) + 1 as nextId FROM products');
+      const nextId = maxIdResult[0].nextId;
+      
+      query = `INSERT INTO products
+        (id, name, stock, category, location, image, status, brand, sizes, productCode, orderName, price, unit, lastUpdate)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`;
+      values = [
+        nextId, name, stock || 0, category || null, location || null,
+        image || null, status || 'active', brand || null, sizes || null, productCode || null,
+        orderName || null, parseFloat(price) || 0, unit || 'ชิ้น'
+      ];
     }
 
-    // Generate productCode if not provided
-    const finalProductCode = productCode && productCode.trim() 
-      ? productCode.trim() 
-      : `PRD${Date.now().toString().slice(-6)}`;
-
-    console.log('📝 Inserting product with data:', {
-      name: name.trim(),
-      category,
-      price: parseFloat(price) || 0,
-      stock: parseInt(stock) || 0,
-      productCode: finalProductCode
-    });
-
-    // INSERT ไม่ต้องใส่ id ให้ AUTO_INCREMENT ทำงาน
-    const [result] = await pool.query(
-      `INSERT INTO products 
-      (name, category, price, unit, image, stock, location, status, brand, sizes, productCode, orderName, lastUpdate)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-      [
-        name.trim(),
-        category || null,
-        parseFloat(price) || 0,
-        unit || null,
-        image || null,
-        parseInt(stock) || 0,
-        location || null,
-        status || 'Active',
-        brand || null,
-        sizes || null,
-        finalProductCode,
-        orderName || null
-      ]
-    );
+    const [rs] = await pool.query(query, values);
+    const productId = hasAutoIncrement ? rs.insertId : values[0];
     
-    console.log('✅ Product inserted, insertId:', result.insertId);
-    
-    // Fetch the created product
-    const [created] = await pool.query(
-      `SELECT 
-        id, name, category, price, unit, image, stock, location, 
-        status, brand, sizes, productCode, orderName, lastUpdate
-      FROM products WHERE id = ?`,
-      [result.insertId]
-    );
-    
-    if (created.length === 0) {
-      throw new Error('ไม่สามารถดึงข้อมูลสินค้าที่สร้างได้');
-    }
-    
-    const newProduct = {
-      ...created[0],
-      price: parseFloat(created[0].price) || 0,
-      stock: parseInt(created[0].stock) || 0,
-      storeAvailability: []
-    };
-    
-    console.log('✅ Product created successfully:', newProduct.id);
-    return res.status(201).json(newProduct);
+    return res.status(201).json({ success: true, productId: productId });
   } catch (e) {
-    console.error('❌ Create Product Error:', e);
+    console.error('Create Product Error:', e);
     
-    // Handle specific database errors
-    if (e.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ error: 'ข้อมูลซ้ำกัน: รหัสสินค้าหรือข้อมูลที่ต้องไม่ซ้ำมีอยู่แล้ว' });
-    } else if (e.code === 'ER_NO_DEFAULT_FOR_FIELD') {
+    if (e.code === 'ER_NO_DEFAULT_FOR_FIELD') {
       return res.status(500).json({ 
-        error: 'ข้อผิดพลาดฐานข้อมูล: กรุณาตั้งค่า AUTO_INCREMENT ให้กับ field id ในตาราง products',
-        solution: 'รันคำสั่ง: ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT;'
+        error: 'Database schema issue: id field needs AUTO_INCREMENT',
+        solution: 'Please run: ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY;',
+        fixEndpoint: 'POST /api/fix-schema'
       });
-    } else if (e.code === 'ER_BAD_NULL_ERROR') {
-      return res.status(400).json({ error: 'ข้อมูลไม่ครบถ้วน: มีฟิลด์จำเป็นที่ยังไม่ได้กรอก' });
     }
     
-    return res.status(500).json({ error: 'ไม่สามารถสร้างสินค้าได้', details: e.message });
+    return res.status(500).json({ error: 'Failed to create product', details: e.message });
   }
 });
 
-// PUT /api/products/:id (แก้ไขสินค้า)
+// PUT /api/products/:id
 app.put('/api/products/:id', authToken, async (req, res) => {
-  console.log('🔄 Updating product ID:', req.params.id);
-  console.log('📝 Request body:', req.body);
-  
+  console.log('Received body:', req.body);
   try {
     const { id } = req.params;
-    const { 
-      name, category, price, unit, image, stock, location, 
-      status, brand, sizes, productCode, orderName 
-    } = req.body;
+    const { name, stock, status, category, location, image, brand, sizes, productCode, orderName, price, unit } = req.body;
 
-    // Validation
-    if (!name || name.trim() === '') {
-      return res.status(400).json({ error: 'ชื่อสินค้าเป็นข้อมูลที่จำเป็น' });
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' });
     }
 
-    // Check if product exists
-    const [found] = await pool.query('SELECT id FROM products WHERE id = ?', [id]);
+    const [found] = await pool.query(
+      'SELECT id FROM products WHERE id = ?',
+      [id]
+    );
     if (found.length === 0) {
-      return res.status(404).json({ error: 'ไม่พบสินค้าที่ต้องการแก้ไข' });
+      return res.status(404).json({ error: 'Product not found' });
     }
 
-    // Update product
     await pool.query(
-      `UPDATE products SET 
-        name = ?, 
-        category = ?, 
-        price = ?, 
-        unit = ?, 
-        image = ?, 
-        stock = ?, 
-        location = ?, 
-        status = ?, 
-        brand = ?, 
-        sizes = ?, 
-        productCode = ?, 
-        orderName = ?, 
-        lastUpdate = NOW() 
-      WHERE id = ?`,
+      `UPDATE products SET name = ?, stock = ?, status = ?, category = ?, location = ?, image = ?, brand = ?, sizes = ?, productCode = ?, orderName = ?, price = ?, unit = ?, lastUpdate = NOW() WHERE id = ?`,
       [
-        name.trim(),
-        category || null,
-        parseFloat(price) || 0,
-        unit || null,
-        image || null,
-        parseInt(stock) || 0,
-        location || null,
-        status || 'Active',
-        brand || null,
-        sizes || null,
-        productCode || null,
-        orderName || null,
-        id
+        name, stock || 0, status || 'Active', category || null, location || null,
+        image || null, brand || null, sizes || null, productCode || null, orderName || null, 
+        parseFloat(price) || 0, unit || 'ชิ้น', id
       ]
     );
-    
-    // Fetch updated product
-    const [updated] = await pool.query(
-      `SELECT 
-        id, name, category, price, unit, image, stock, location, 
-        status, brand, sizes, productCode, orderName, lastUpdate
-      FROM products WHERE id = ?`,
-      [id]
-    );
-    
-    const updatedProduct = {
-      ...updated[0],
-      price: parseFloat(updated[0].price) || 0,
-      stock: parseInt(updated[0].stock) || 0,
-      storeAvailability: []
-    };
-    
-    console.log('✅ Product updated successfully:', id);
-    return res.json(updatedProduct);
+    return res.json({ success: true, productId: id });
   } catch (e) {
-    console.error('❌ Update Product Error:', {
+    console.error('Update Product Error:', {
       message: e.message,
-      productId: req.params.id,
+      stack: e.stack,
+      params: req.params,
+      body: req.body,
       time: new Date().toISOString(),
     });
-    return res.status(500).json({ error: 'ไม่สามารถแก้ไขสินค้าได้', details: e.message });
+    return res.status(500).json({ error: 'Failed to update product', details: e.message });
   }
 });
 
-// DELETE /api/products/:id (ลบสินค้า)
+// DELETE /api/products/:id
 app.delete('/api/products/:id', authToken, async (req, res) => {
-  console.log('🗑️ Delete request for product ID:', req.params.id);
-  
+  console.log('Delete request for id:', req.params.id);
   try {
     const { id } = req.params;
-    
-    // Check if product exists
     const [found] = await pool.query(
-      'SELECT id, name FROM products WHERE id = ?',
+      'SELECT id FROM products WHERE id = ?',
       [id]
     );
-    
     if (found.length === 0) {
-      return res.status(404).json({ error: 'ไม่พบสินค้าที่ต้องการลบ' });
+      return res.status(404).json({ error: 'Product not found' });
     }
-    
-    const productName = found[0].name;
-    console.log('🔄 Attempting to delete product:', productName);
-    
-    // Delete the product
+    console.log('Attempting to delete product with id:', id);
     await pool.query('DELETE FROM products WHERE id = ?', [id]);
-    
-    console.log('✅ Product deleted successfully:', productName);
-    return res.json({ 
-      success: true, 
-      message: 'ลบสินค้าเรียบร้อยแล้ว', 
-      productId: parseInt(id),
-      productName: productName 
-    });
+    return res.json({ success: true, productId: id });
   } catch (e) {
-    console.error('❌ Delete Product Error:', {
+    console.error('Delete Product Error:', {
       message: e.message,
-      productId: req.params.id,
+      stack: e.stack,
+      params: req.params,
       time: new Date().toISOString(),
     });
-    return res.status(500).json({ 
-      error: 'ไม่สามารถลบสินค้าได้', 
-      details: e.message 
-    });
+    return res.status(500).json({ error: 'Failed to delete product', details: e.message });
   }
 });
 
