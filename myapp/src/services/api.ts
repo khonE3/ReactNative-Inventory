@@ -126,24 +126,63 @@ export const updateProduct = async (id: number, productData: Partial<Product>): 
 };
 
 export const deleteProduct = async (id: number): Promise<void> => {
+  console.log('🚀 API: deleteProduct function called');
+  console.log('📋 API: Input parameters:', { id, type: typeof id });
+  
   try {
-    console.log('Deleting product:', id);
+    console.log('🗑️ API: Starting delete for product ID:', id);
     const headers = await getHeaders();
-    const response = await fetch(`${BACKEND_URL}/api/products/${id}`, {
+    const headersObj = headers as Record<string, string>;
+    console.log('🔑 API: Headers prepared:', { 
+      hasAuth: !!headersObj['Authorization'],
+      contentType: headersObj['Content-Type']
+    });
+    
+    const deleteUrl = `${BACKEND_URL}/api/products/${id}`;
+    console.log('🌐 API: Sending DELETE request to:', deleteUrl);
+    console.log('🌐 API: Full request details:', {
+      url: deleteUrl,
+      method: 'DELETE',
+      headers: {
+        ...headersObj,
+        Authorization: headersObj['Authorization'] ? 'Bearer ***' : 'None'
+      }
+    });
+    
+    const response = await fetch(deleteUrl, {
       method: 'DELETE',
       headers,
+    });
+    
+    console.log('📡 API: Delete response received');
+    console.log('📊 API: Response details:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+      url: response.url
     });
     
     if (!response.ok) {
       if (response.status === 401) {
         throw new Error('Authentication required. Please login again.');
       }
-      throw new Error(`Failed to delete product: ${response.status} ${response.statusText}`);
+      if (response.status === 404) {
+        throw new Error('ไม่พบสินค้าที่ต้องการลบ');
+      }
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Failed to delete product: ${response.status} ${response.statusText} - ${errorData.error || ''}`);
     }
     
-    console.log('Product deleted successfully');
+    const result = await response.json();
+    console.log('✅ API: Product deleted successfully:', result);
   } catch (error) {
-    console.error('Delete Product API Error:', error);
+    console.error('❌ Delete Product API Error:', error);
+    
+    // Better error messages for common issues
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
+    }
+    
     throw error;
   }
 };

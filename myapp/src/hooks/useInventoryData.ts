@@ -216,23 +216,44 @@ export const useInventoryData = () => {
   }, [fetchData]);
 
   const deleteProduct = useCallback(async (id: number) => {
-    console.log('🗑️ useInventoryData: deleteProduct called with ID:', id);
+    console.log('� useInventoryData: deleteProduct function entry point');
+    console.log('📋 useInventoryData: Input parameters:', { id, type: typeof id });
+    console.log('�🗑️ useInventoryData: deleteProduct called with ID:', id);
+    console.log('🔄 useInventoryData: Current state before delete:', {
+      productsCount: products.length,
+      loading,
+      error,
+      timestamp: new Date().toISOString()
+    });
+    
     try {
+      console.log('🧹 useInventoryData: Clearing error state...');
       setError(null);
-      console.log('📞 Calling deleteProductAPI...');
+      console.log('⏳ useInventoryData: Setting loading to true...');
+      setLoading(true); // Show loading during delete
+      console.log('📞 useInventoryData: About to call deleteProductAPI...');
       
       // Call API to delete product from database
       await deleteProductAPI(id);
       
-      console.log('✅ API call successful, refreshing data...');
+      console.log('✅ useInventoryData: API call successful, refreshing data...');
       // Refresh data from database to ensure consistency
       await fetchData();
       
-      console.log('✅ Product deleted successfully:', id);
+      console.log('🎉 useInventoryData: Product deleted successfully:', id);
     } catch (err) {
-      console.error('❌ Delete product error:', err);
+      console.error('❌ useInventoryData: Delete product error:', err);
+      console.error('💥 useInventoryData: Error details:', {
+        message: err instanceof Error ? err.message : 'Unknown error',
+        stack: err instanceof Error ? err.stack : 'No stack trace',
+        type: typeof err,
+        timestamp: new Date().toISOString()
+      });
       setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า');
       throw err; // Re-throw for component error handling
+    } finally {
+      console.log('🏁 useInventoryData: Finally block - stopping loading...');
+      setLoading(false); // Stop loading
     }
   }, [fetchData]);
 

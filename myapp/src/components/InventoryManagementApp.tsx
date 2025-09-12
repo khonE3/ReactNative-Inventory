@@ -24,6 +24,7 @@ import { CyberPunkTheme } from '../constants';
 import { Product, ProductFormData } from '../types';
 
 export const InventoryManagementApp = () => {
+  console.log('🏠 InventoryManagementApp component rendered');
   const { user, logout } = useAuth();
   const {
     products,
@@ -63,15 +64,32 @@ export const InventoryManagementApp = () => {
   };
 
   const handleDeleteProduct = async (productId: number) => {
-    console.log('🔄 InventoryManagementApp: handleDeleteProduct called with ID:', productId);
+    console.log('� MAIN APP: handleDeleteProduct function called!');
+    console.log('�🔄 InventoryManagementApp: handleDeleteProduct called with ID:', productId);
+    
+    // Show loading alert
+    Alert.alert('กำลังลบสินค้า...', 'กรุณารอสักครู่', [], { cancelable: false });
+    
     try {
       console.log('📞 Calling deleteProduct function...');
       await deleteProduct(productId);
       console.log('✅ Delete successful');
-      Alert.alert('สำเร็จ', 'ลบสินค้าสำเร็จ');
+      
+      // Show success alert
+      Alert.alert(
+        'สำเร็จ! ✅', 
+        'ลบสินค้าเรียบร้อยแล้ว',
+        [{ text: 'ตกลง', style: 'default' }]
+      );
     } catch (error) {
       console.error('❌ Delete error:', error);
-      Alert.alert('ข้อผิดพลาด', error instanceof Error ? error.message : 'เกิดข้อผิดพลาด');
+      
+      // Show error alert
+      Alert.alert(
+        'เกิดข้อผิดพลาด ❌', 
+        error instanceof Error ? error.message : 'ไม่สามารถลบสินค้าได้',
+        [{ text: 'ตกลง', style: 'default' }]
+      );
     }
   };
 
@@ -120,6 +138,12 @@ export const InventoryManagementApp = () => {
 
   const renderProductCard = ({ item }: { item: Product }) => {
     console.log('🎯 Rendering ProductCard for:', item.name, 'with onDelete:', !!handleDeleteProduct);
+    console.log('🎯 Product details:', {
+      id: item.id,
+      name: item.name,
+      hasDeleteHandler: !!handleDeleteProduct,
+      deleteHandler: typeof handleDeleteProduct
+    });
     return (
       <ProductCard
         product={item}
@@ -149,6 +173,9 @@ export const InventoryManagementApp = () => {
       </SafeAreaView>
     );
   }
+
+  console.log('🎯 About to render main UI with', products.length, 'products');
+  console.log('🎯 handleDeleteProduct is:', typeof handleDeleteProduct);
 
   return (
     <SafeAreaView style={[layoutStyles.container, { backgroundColor: CyberPunkTheme.colors.background }]}>
