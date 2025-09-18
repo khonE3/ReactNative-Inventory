@@ -25,6 +25,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     hasOnEdit: !!onEdit,
     hasOnPress: !!onPress
   });
+
+  // เพิ่ม Alert เพื่อ debug การ render
+  React.useEffect(() => {
+    if (onDelete) {
+      console.log('🎯 ProductCard mounted with DELETE function for:', product.name);
+    }
+  }, [onDelete, product.name]);
   
   const isLowStock = (product.stock || 0) <= 20;
   const isActive = product.status === 'active';
@@ -101,54 +108,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
-  const handleDelete = () => {
-    console.log('�🚀🚀 HANDLE DELETE CALLED!');
-    console.log('🗑️ Product details:', { id: product.id, name: product.name });
-    console.log('🔍 onDelete function available:', !!onDelete);
-    
-    try {
-      console.log('📱 Showing delete confirmation alert...');
-      Alert.alert(
-        '⚠️ ยืนยันการลบ',
-        `คุณต้องการลบสินค้า "${product.name}" หรือไม่?\n\n⚠️ การดำเนินการนี้ไม่สามารถยกเลิกได้`,
-        [
-          {
-            text: 'ยกเลิก',
-            style: 'cancel',
-            onPress: () => {
-              console.log('❌ User cancelled delete');
-            }
-          },
-          {
-            text: 'ลบสินค้า',
-            style: 'destructive',
-            onPress: async () => {
-              console.log('✅ User confirmed delete for product:', product.id);
-              if (onDelete) {
-                console.log('📞 Calling onDelete function with ID:', product.id);
-                try {
-                  await onDelete(product.id);
-                  console.log('✅ onDelete function completed successfully');
-                } catch (error) {
-                  console.error('❌ onDelete function failed:', error);
-                  Alert.alert('ข้อผิดพลาด', 'การลบไม่สำเร็จ: ' + (error instanceof Error ? error.message : 'Unknown error'));
-                }
-              } else {
-                console.log('❌ onDelete function not available');
-                Alert.alert('ข้อผิดพลาด', 'ไม่สามารถลบสินค้าได้ กรุณาลองใหม่อีกครั้ง');
-              }
-            },
-          },
-        ]
-      );
-      console.log('📱 Alert should be visible now');
-    } catch (error) {
-      console.error('💥 Error in handleDelete:', error);
-      Alert.alert('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในระบบ');
-    }
-  };
+
 
   console.log('🎯 ProductCard about to render with delete button:', !!onDelete);
+  console.log('🎯 Product details for rendering:', {
+    id: product.id,
+    name: product.name,
+    onDeleteExists: !!onDelete,
+    buttonWillRender: !!(onEdit || onDelete)
+  });
 
   return (
     <View style={[inventoryStyles.productCard, { elevation: 8, shadowOpacity: 0.3 }]}>
@@ -298,86 +266,67 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </View>
       </View>
 
-      {/* Enhanced Action Buttons */}
-      {(onEdit || onDelete) && (
-        <View 
-          style={[inventoryStyles.actionButtons, { 
-            backgroundColor: CyberPunkTheme.colors.surface, 
-            borderRadius: 8, 
-            margin: 8, 
-            padding: 4, 
-            elevation: 2,
-            pointerEvents: 'box-none'
-          }]}
-        >
-          {onEdit && (
-            <TouchableOpacity 
-              style={[inventoryStyles.editButton, { 
-                backgroundColor: CyberPunkTheme.colors.primary,
-                borderRadius: 6,
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                elevation: 2
-              }]}
-              onPress={handleEdit}
-              activeOpacity={0.8}
-            >
-              <Text style={[inventoryStyles.editButtonText, { fontSize: 12, fontWeight: 'bold', color: 'white' }]}>
-                ✏️ แก้ไข
-              </Text>
-            </TouchableOpacity>
-          )}
-          {onDelete && (() => {
-            console.log('🔴 Creating DELETE button for product:', product.name);
-            return (
-              <TouchableOpacity 
-                style={{ 
-                  backgroundColor: '#FF4757', // สีแดงเข้ม
-                  borderRadius: 8,
-                  paddingHorizontal: 16,
-                  paddingVertical: 10,
-                  elevation: 8,
-                  shadowColor: '#FF4757',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 4,
-                  minWidth: 80,
-                  minHeight: 40,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 2,
-                  borderColor: '#FFFFFF'
-                }}
-                onPress={() => {
-                  console.log('🚨 DELETE BUTTON DEFINITELY PRESSED!');
-                  console.log('Product ID:', product.id);
-                  console.log('Product Name:', product.name);
-                  console.log('Calling handleDelete directly...');
-                  handleDelete();
-                }}
-                activeOpacity={0.6}
-              >
-                <Text style={{ 
-                  fontSize: 16, 
-                  fontWeight: 'bold', 
-                  color: 'white',
-                  textAlign: 'center'
-                }}>
-                  🗑️ ลบ
-                </Text>
-              </TouchableOpacity>
-            );
-          })()}
-        </View>
-      )}
-      {/* Debug info */}
-      {__DEV__ && (
-        <View style={{ padding: 4, backgroundColor: 'rgba(255,255,255,0.1)', margin: 4 }}>
-          <Text style={{ color: 'white', fontSize: 10 }}>
-            Debug: ID={product.id}, onEdit={onEdit ? 'true' : 'false'}, onDelete={onDelete ? 'true' : 'false'}
-          </Text>
-        </View>
-      )}
+      {/* Action Buttons */}
+      <View style={{ 
+        flexDirection: 'row', 
+        justifyContent: 'space-around', 
+        padding: 10,
+        backgroundColor: 'rgba(0,0,0,0.1)',
+        margin: 5,
+        borderRadius: 10
+      }}>
+        {onEdit && (
+          <TouchableOpacity 
+            style={{
+              backgroundColor: CyberPunkTheme.colors.primary,
+              paddingHorizontal: 15,
+              paddingVertical: 8,
+              borderRadius: 8,
+              flex: 1,
+              marginRight: onDelete ? 5 : 0,
+              alignItems: 'center'
+            }}
+            onPress={handleEdit}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              ✏️ แก้ไข
+            </Text>
+          </TouchableOpacity>
+        )}
+        
+        {onDelete && (
+          <TouchableOpacity 
+            style={{
+              backgroundColor: '#DC3545',
+              paddingHorizontal: 15,
+              paddingVertical: 8,
+              borderRadius: 8,
+              flex: 1,
+              marginLeft: onEdit ? 5 : 0,
+              alignItems: 'center'
+            }}
+            onPress={() => {
+              Alert.alert(
+                '⚠️ ยืนยันการลบ',
+                `คุณต้องการลบสินค้า "${product.name}" หรือไม่?`,
+                [
+                  { text: 'ยกเลิก', style: 'cancel' },
+                  { 
+                    text: 'ลบ', 
+                    style: 'destructive',
+                    onPress: () => onDelete(product.id)
+                  }
+                ]
+              );
+            }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>
+              🗑️ ลบ
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
     </View>
   );
 };

@@ -64,31 +64,42 @@ export const InventoryManagementApp = () => {
   };
 
   const handleDeleteProduct = async (productId: number) => {
-    console.log('� MAIN APP: handleDeleteProduct function called!');
-    console.log('�🔄 InventoryManagementApp: handleDeleteProduct called with ID:', productId);
+    console.log('🚀 MAIN APP: handleDeleteProduct function called!');
+    console.log('🔄 InventoryManagementApp: handleDeleteProduct called with ID:', productId);
     
-    // Show loading alert
-    Alert.alert('กำลังลบสินค้า...', 'กรุณารอสักครู่', [], { cancelable: false });
+    // Find product name for better user experience
+    const productName = products.find(p => p.id === productId)?.name || `ID: ${productId}`;
+    console.log('🎯 MAIN APP: Deleting product:', productName);
     
     try {
-      console.log('📞 Calling deleteProduct function...');
+      console.log('📞 MAIN APP: Calling deleteProduct function...');
       await deleteProduct(productId);
-      console.log('✅ Delete successful');
+      console.log('✅ MAIN APP: Delete successful');
       
       // Show success alert
       Alert.alert(
         'สำเร็จ! ✅', 
-        'ลบสินค้าเรียบร้อยแล้ว',
+        `ลบสินค้า "${productName}" เรียบร้อยแล้ว`,
         [{ text: 'ตกลง', style: 'default' }]
       );
     } catch (error) {
-      console.error('❌ Delete error:', error);
+      console.error('❌ MAIN APP: Delete error:', error);
+      console.error('💥 MAIN APP: Error details:', {
+        error,
+        productId,
+        productName,
+        timestamp: new Date().toISOString()
+      });
       
-      // Show error alert
+      // Show detailed error alert
+      const errorMessage = error instanceof Error ? error.message : 'ไม่สามารถลบสินค้าได้';
       Alert.alert(
         'เกิดข้อผิดพลาด ❌', 
-        error instanceof Error ? error.message : 'ไม่สามารถลบสินค้าได้',
-        [{ text: 'ตกลง', style: 'default' }]
+        `ไม่สามารถลบสินค้า "${productName}" ได้\n\nข้อผิดพลาด: ${errorMessage}`,
+        [
+          { text: 'ตกลง', style: 'default' },
+          { text: 'ลองใหม่', style: 'default', onPress: () => handleDeleteProduct(productId) }
+        ]
       );
     }
   };

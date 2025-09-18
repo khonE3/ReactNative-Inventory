@@ -216,15 +216,19 @@ export const useInventoryData = () => {
   }, [fetchData]);
 
   const deleteProduct = useCallback(async (id: number) => {
-    console.log('� useInventoryData: deleteProduct function entry point');
+    console.log('🚀 useInventoryData: deleteProduct function entry point');
     console.log('📋 useInventoryData: Input parameters:', { id, type: typeof id });
-    console.log('�🗑️ useInventoryData: deleteProduct called with ID:', id);
+    console.log('🗑️ useInventoryData: deleteProduct called with ID:', id);
     console.log('🔄 useInventoryData: Current state before delete:', {
       productsCount: products.length,
       loading,
       error,
       timestamp: new Date().toISOString()
     });
+    
+    // Find the product being deleted for logging
+    const productToDelete = products.find(p => p.id === id);
+    console.log('🎯 useInventoryData: Product to delete:', productToDelete);
     
     try {
       console.log('🧹 useInventoryData: Clearing error state...');
@@ -241,21 +245,27 @@ export const useInventoryData = () => {
       await fetchData();
       
       console.log('🎉 useInventoryData: Product deleted successfully:', id);
+      console.log('📊 useInventoryData: Products count after delete:', products.length);
     } catch (err) {
       console.error('❌ useInventoryData: Delete product error:', err);
       console.error('💥 useInventoryData: Error details:', {
         message: err instanceof Error ? err.message : 'Unknown error',
         stack: err instanceof Error ? err.stack : 'No stack trace',
         type: typeof err,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        productId: id,
+        productName: productToDelete?.name
       });
-      setError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า');
+      
+      const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า';
+      setError(errorMessage);
+      console.log('🔔 useInventoryData: Error set to:', errorMessage);
       throw err; // Re-throw for component error handling
     } finally {
       console.log('🏁 useInventoryData: Finally block - stopping loading...');
       setLoading(false); // Stop loading
     }
-  }, [fetchData]);
+  }, [fetchData, products]);
 
   useEffect(() => {
     fetchData();

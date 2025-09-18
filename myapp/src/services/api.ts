@@ -129,13 +129,18 @@ export const deleteProduct = async (id: number): Promise<void> => {
   console.log('🚀 API: deleteProduct function called');
   console.log('📋 API: Input parameters:', { id, type: typeof id });
   
+  if (!id || isNaN(id)) {
+    throw new Error('ไม่พบ ID สินค้าที่ต้องการลบ');
+  }
+  
   try {
     console.log('🗑️ API: Starting delete for product ID:', id);
     const headers = await getHeaders();
     const headersObj = headers as Record<string, string>;
     console.log('🔑 API: Headers prepared:', { 
       hasAuth: !!headersObj['Authorization'],
-      contentType: headersObj['Content-Type']
+      contentType: headersObj['Content-Type'],
+      authToken: headersObj['Authorization'] ? headersObj['Authorization'].substring(0, 20) + '...' : 'None'
     });
     
     const deleteUrl = `${BACKEND_URL}/api/products/${id}`;
@@ -161,6 +166,10 @@ export const deleteProduct = async (id: number): Promise<void> => {
       ok: response.ok,
       url: response.url
     });
+
+    // Get response text first for debugging
+    const responseText = await response.text();
+    console.log('📄 API: Raw response text:', responseText);
     
     if (!response.ok) {
       if (response.status === 401) {
@@ -169,14 +178,29 @@ export const deleteProduct = async (id: number): Promise<void> => {
       if (response.status === 404) {
         throw new Error('ไม่พบสินค้าที่ต้องการลบ');
       }
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Failed to delete product: ${response.status} ${response.statusText} - ${errorData.error || ''}`);
+      
+      let errorData: any = {};
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (e) {
+        console.log('📄 API: Response is not JSON, using as text');
+      }
+      
+      throw new Error(`Failed to delete product: ${response.status} ${response.statusText} - ${errorData.error || responseText || ''}`);
     }
     
-    const result = await response.json();
+    let result = {};
+    try {
+      result = JSON.parse(responseText);
+    } catch (e) {
+      console.log('📄 API: Success response is not JSON, treating as success');
+      result = { success: true, message: responseText };
+    }
+    
     console.log('✅ API: Product deleted successfully:', result);
   } catch (error) {
     console.error('❌ Delete Product API Error:', error);
+    console.error('💥 API: Error stack:', error instanceof Error ? error.stack : 'No stack');
     
     // Better error messages for common issues
     if (error instanceof TypeError && error.message.includes('fetch')) {
