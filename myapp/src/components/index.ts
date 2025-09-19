@@ -11,6 +11,7 @@ export { EmptyInventoryState } from './EmptyInventoryState';
 export { ProductForm } from './ProductForm';
 export { ActionButton } from './ActionButton';
 export { ExportButton } from './ExportButton';
+export { SQLExportTest } from './SQLExportTest';
 export { InventoryManagementApp } from './InventoryManagementApp';
 
 // Auth Components

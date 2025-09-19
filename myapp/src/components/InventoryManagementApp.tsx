@@ -238,6 +238,27 @@ export const InventoryManagementApp = () => {
               onCategorySelect={handleCategoryFilter}
             />
 
+            {/* SQL Export Test Button - Development Only */}
+            {__DEV__ && (
+              <View style={{ padding: 10, backgroundColor: '#ffffcc', margin: 10, borderRadius: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <ActionButton
+                  title={`🧪 SQL Export (${products.length} รายการ)`}
+                  onPress={async () => {
+                    try {
+                      console.log('🧪 Testing SQL export with', products.length, 'products');
+                      Alert.alert('🧪 Debug Info', `กำลังทดสอบ SQL Export\nจำนวนสินค้า: ${products.length} รายการ\nเปิด Console เพื่อดู logs`);
+                      const { ExportService } = await import('../services/exportService');
+                      await ExportService.exportToSQL(products);
+                    } catch (error) {
+                      console.error('❌ SQL Export test failed:', error);
+                      Alert.alert('ข้อผิดพลาด', `ทดสอบ SQL Export ล้มเหลว: ${error}`);
+                    }
+                  }}
+                  variant="secondary"
+                />
+              </View>
+            )}
+
             {/* Action Buttons */}
             <View style={styles.actionButtonsContainer}>
               <ActionButton
