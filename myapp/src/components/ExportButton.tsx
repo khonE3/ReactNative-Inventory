@@ -31,11 +31,13 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
     setIsExporting(true);
 
     try {
-      if (type === 'excel') {
-        await ExportService.exportToExcel(products);
-      } else {
-        await ExportService.exportToPDF(products);
-      }
+      // Temporarily disabled export functionality
+      Alert.alert('ข้อมูล', `การส่งออก ${type} ถูกปิดการใช้งานชั่วคราว`);
+      // if (type === 'excel') {
+      //   await ExportService.exportToExcel(products);
+      // } else {
+      //   await ExportService.exportToPDF(products);
+      // }
     } catch (error) {
       console.error('Export error:', error);
       Alert.alert('ข้อผิดพลาด', 'ไม่สามารถส่งออกข้อมูลได้');

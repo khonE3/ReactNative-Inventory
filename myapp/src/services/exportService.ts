@@ -1,10 +1,7 @@
-import * as XLSX from 'xlsx';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { Product } from '../types';
 import { Alert, Platform } from 'react-native';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 export interface ExportData {
   products: Product[];
@@ -15,6 +12,15 @@ export class ExportService {
   // Export ข้อมูลเป็น Excel
   static async exportToExcel(products: Product[]): Promise<void> {
     try {
+      // Check if we're on web platform
+      if (Platform.OS !== 'web') {
+        Alert.alert('ข้อมูล', 'การส่งออก Excel รองรับเฉพาะเว็บเบราว์เซอร์เท่านั้น');
+        return;
+      }
+
+      // Dynamic import for web only
+      const XLSX = await import('xlsx');
+      
       // เตรียมข้อมูลสำหรับ Excel
       const excelData = products.map((product, index) => ({
         'ลำดับ': index + 1,
@@ -146,6 +152,10 @@ export class ExportService {
   // สร้าง PDF จาก HTML โดยตรงด้วย html2canvas + jsPDF
   private static async generatePDFFromHTML(products: Product[], fileName: string): Promise<void> {
     try {
+      // Dynamic imports for web only
+      const html2canvas = await import('html2canvas');
+      const jsPDF = (await import('jspdf')).default;
+      
       console.log('Starting PDF generation with', products.length, 'products');
       
       // สร้าง temporary div สำหรับ render HTML
@@ -181,7 +191,7 @@ export class ExportService {
       });
 
       // ใช้ html2canvas แปลงเป็น image
-      const canvas = await html2canvas(targetElement, {
+      const canvas = await html2canvas.default(targetElement, {
         width: targetElement?.scrollWidth || 1200,
         height: targetElement?.scrollHeight || 800,
         scale: 1.5,
@@ -203,7 +213,7 @@ export class ExportService {
       // ตรวจสอบว่า canvas มีข้อมูลหรือไม่
       const ctx = canvas.getContext('2d');
       const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height);
-      const hasContent = imageData?.data.some((pixel, index) => {
+      const hasContent = imageData?.data.some((pixel: number, index: number) => {
         // ตรวจสอบ RGB channels (ไม่รวม alpha)
         if ((index + 1) % 4 !== 0) {
           return pixel !== 255; // ถ้าไม่ใช่สีขาว (255, 255, 255)
