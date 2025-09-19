@@ -418,7 +418,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+                style={[
+                  styles.submitButton, 
+                  mode === 'edit' && styles.submitButtonEdit,
+                  loading && styles.submitButtonDisabled
+                ]}
                 onPress={handleSubmit}
                 disabled={loading}
               >
@@ -426,9 +430,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   {loading ? null : mode === 'add' ? (
                     <AddIcon size={16} color="white" />
                   ) : (
-                    <EditIcon size={16} color="white" />
+                    <EditIcon size={16} color="black" />
                   )}
-                  <Text style={[styles.submitButtonText, { marginLeft: loading ? 0 : 4 }]}>
+                  <Text style={[
+                    styles.submitButtonText, 
+                    mode === 'edit' && styles.submitButtonTextEdit,
+                    { marginLeft: loading ? 0 : 4 }
+                  ]}>
                     {loading ? 'กำลังบันทึก...' : mode === 'add' ? 'เพิ่มสินค้า' : 'บันทึกการแก้ไข'}
                   </Text>
                 </View>
@@ -673,6 +681,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
   },
+  submitButtonEdit: {
+    backgroundColor: CyberPunkTheme.colors.neonGreen,
+  },
   submitButtonDisabled: {
     opacity: 0.6,
     elevation: 1,
@@ -681,5 +692,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
+  },
+  submitButtonTextEdit: {
+    color: 'black',
   },
 });

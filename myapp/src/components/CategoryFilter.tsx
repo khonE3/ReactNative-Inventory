@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { inventoryStyles } from '../styles/inventory';
 
@@ -13,6 +13,8 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedCategory,
   onCategorySelect
 }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
     <View style={inventoryStyles.categoryContainer}>
       <ScrollView 
@@ -28,11 +30,14 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
               selectedCategory === category && inventoryStyles.categoryButtonActive
             ]}
             onPress={() => onCategorySelect(category)}
+            onPressIn={() => setHoveredIndex(index)}
+            onPressOut={() => setHoveredIndex(null)}
             activeOpacity={0.8}
           >
             <Text style={[
               inventoryStyles.categoryFilter,
-              selectedCategory === category && inventoryStyles.categoryTextActive
+              selectedCategory === category && inventoryStyles.categoryTextActive,
+              hoveredIndex === index && { color: 'black' }
             ]}>
               {category}
             </Text>
