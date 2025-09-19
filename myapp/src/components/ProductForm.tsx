@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Modal,
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ScrollView,
   Alert,
-  Modal,
-  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { CyberPunkTheme } from '../constants';
 import { ProductFormData, Product } from '../types';
+import { LinearGradient } from 'expo-linear-gradient';
+import { CyberPunkTheme } from '../constants/theme';
+import { AddIcon, EditIcon, ViewIcon, PackageIcon } from './Icons';
 
 interface ProductFormProps {
   visible: boolean;
@@ -172,9 +174,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             style={styles.header}
           >
             <View style={styles.headerContent}>
-              <Text style={styles.headerIcon}>
-                {mode === 'add' ? '➕' : mode === 'edit' ? '✏️' : '👁️'}
-              </Text>
+              <View style={styles.headerIcon}>
+                {mode === 'add' ? (
+                  <AddIcon size={24} color={CyberPunkTheme.colors.primary} />
+                ) : mode === 'edit' ? (
+                  <EditIcon size={24} color={CyberPunkTheme.colors.neonPink} />
+                ) : (
+                  <ViewIcon size={24} color={CyberPunkTheme.colors.textSecondary} />
+                )}
+              </View>
               <Text style={styles.headerTitle}>
                 {mode === 'add' ? 'เพิ่มสินค้าใหม่' : mode === 'edit' ? 'แก้ไขสินค้า' : 'รายละเอียดสินค้า'}
               </Text>
@@ -403,7 +411,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 style={styles.submitButton}
                 onPress={() => initialData && onEdit && onEdit(initialData)}
               >
-                <Text style={styles.submitButtonText}>✏️ แก้ไข</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <EditIcon size={16} color="white" />
+                  <Text style={[styles.submitButtonText, { marginLeft: 4 }]}>แก้ไข</Text>
+                </View>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -411,9 +422,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 onPress={handleSubmit}
                 disabled={loading}
               >
-                <Text style={styles.submitButtonText}>
-                  {loading ? '⏳ กำลังบันทึก...' : mode === 'add' ? '➕ เพิ่มสินค้า' : '💾 บันทึกการแก้ไข'}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {loading ? null : mode === 'add' ? (
+                    <AddIcon size={16} color="white" />
+                  ) : (
+                    <EditIcon size={16} color="white" />
+                  )}
+                  <Text style={[styles.submitButtonText, { marginLeft: loading ? 0 : 4 }]}>
+                    {loading ? 'กำลังบันทึก...' : mode === 'add' ? 'เพิ่มสินค้า' : 'บันทึกการแก้ไข'}
+                  </Text>
+                </View>
               </TouchableOpacity>
             )}
           </LinearGradient>

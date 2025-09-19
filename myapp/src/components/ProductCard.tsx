@@ -4,6 +4,7 @@ import { Product } from '../types';
 import { inventoryStyles } from '../styles/inventory';
 import { CyberPunkTheme } from '../constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
+import { WarningIcon, PackageIcon, CategoryIcon, LocationIcon, CompanyIcon, EditIcon, DeleteIcon, BrandIcon } from './Icons';
 
 interface ProductCardProps {
   product: Product;
@@ -192,14 +193,48 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Enhanced Low Stock Warning */}
       {isLowStock && (
-        <LinearGradient
-          colors={[CyberPunkTheme.colors.warning, CyberPunkTheme.colors.warning + '80']}
-          style={[inventoryStyles.lowStockWarning, { borderRadius: 8, elevation: 4 }]}
-        >
-          <Text style={[inventoryStyles.lowStockText, { fontSize: 11, fontWeight: 'bold' }]}>
-            ⚠️ สต็อกต่ำ!
-          </Text>
-        </LinearGradient>
+        <View style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          zIndex: 10,
+          borderRadius: 20,
+          elevation: 6,
+          shadowColor: CyberPunkTheme.colors.warning,
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.4,
+          shadowRadius: 5,
+        }}>
+          <LinearGradient
+            colors={[CyberPunkTheme.colors.warning, CyberPunkTheme.colors.neonOrange]}
+            style={{
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 20,
+              borderWidth: 1.5,
+              borderColor: '#FFFFFF40',
+              alignItems: 'center',
+            }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <WarningIcon size={16} color="white" />
+              <Text style={{
+                color: 'white',
+                fontSize: 12,
+                fontWeight: 'bold',
+                marginLeft: 4,
+                textShadowColor: 'rgba(0,0,0,0.5)',
+                textShadowOffset: { width: 1, height: 1 },
+                textShadowRadius: 2,
+                letterSpacing: 0.5,
+              }}>
+                สต็อกต่ำ!
+              </Text>
+            </View>
+          </LinearGradient>
+        </View>
       )}
 
       {/* Enhanced Product Image */}
@@ -215,7 +250,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             colors={[CyberPunkTheme.colors.surfaceLight, CyberPunkTheme.colors.surface]}
             style={[inventoryStyles.productImagePlaceholder, { borderRadius: 10 }]}
           >
-            <Text style={[inventoryStyles.placeholderText, { fontSize: 32 }]}>📦</Text>
+            <PackageIcon size={40} color={CyberPunkTheme.colors.textMuted} />
           </LinearGradient>
         )}
       </View>
@@ -236,9 +271,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           colors={[CyberPunkTheme.colors.primary + '30', CyberPunkTheme.colors.primary + '15']}
           style={[inventoryStyles.categoryBadge, { borderRadius: 12, borderWidth: 1, borderColor: CyberPunkTheme.colors.primary + '40' }]}
         >
-          <Text style={[inventoryStyles.categoryText, { fontWeight: '600' }]}>
-            🏷️ {product.category}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <CategoryIcon size={14} color="#D2B48C" />
+            <Text style={[inventoryStyles.categoryText, { fontWeight: '600', marginLeft: 4 }]}>
+              {product.category}
+            </Text>
+          </View>
         </LinearGradient>
       </View>
 
@@ -271,14 +309,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Enhanced Location and Brand */}
       <View style={[inventoryStyles.additionalInfo, { backgroundColor: CyberPunkTheme.colors.surfaceLight + '50', borderRadius: 6, margin: 8, padding: 6 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
-          <Text style={[inventoryStyles.locationText, { fontSize: 11, flex: 1 }]}>
-            📍 {product.location}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <LocationIcon size={12} color={CyberPunkTheme.colors.textSecondary} />
+            <Text style={[inventoryStyles.locationText, { fontSize: 11, marginLeft: 4 }]}>
+              {product.location}
+            </Text>
+          </View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={[inventoryStyles.brandText, { fontSize: 11, flex: 1 }]}>
-            � {product.brand}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+            <BrandIcon size={12} color={CyberPunkTheme.colors.textSecondary} />
+            <Text style={[inventoryStyles.brandText, { fontSize: 11, marginLeft: 4 }]}>
+              {product.brand}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -324,19 +368,46 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {onEdit && (
           <TouchableOpacity 
             style={{
-              backgroundColor: CyberPunkTheme.colors.primary,
-              paddingHorizontal: 15,
-              paddingVertical: 8,
-              borderRadius: 8,
               flex: 1,
               marginRight: onDelete ? 5 : 0,
-              alignItems: 'center'
+              borderRadius: 12,
+              elevation: 3,
+              shadowColor: CyberPunkTheme.colors.neonPink,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
             }}
             onPress={handleEdit}
+            activeOpacity={0.8}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>
-              ✏️ แก้ไข
-            </Text>
+            <LinearGradient
+              colors={[CyberPunkTheme.colors.neonPink, CyberPunkTheme.colors.neonPink + 'CC']}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 12,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: CyberPunkTheme.colors.neonPink + '40',
+              }}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <EditIcon size={18} color="white" />
+                <Text style={{ 
+                  color: 'white', 
+                  fontWeight: 'bold', 
+                  marginLeft: 6,
+                  fontSize: 14,
+                  textShadowColor: 'rgba(0,0,0,0.3)',
+                  textShadowOffset: { width: 1, height: 1 },
+                  textShadowRadius: 2,
+                }}>
+                  แก้ไข
+                </Text>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         )}
         
@@ -348,20 +419,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         })() && (
           <TouchableOpacity 
             style={{
-              backgroundColor: 'red', // เปลี่ยนเป็นสีแดงเต็มๆ เพื่อให้เห็นชัด
-              paddingHorizontal: 20,
-              paddingVertical: 12,
-              borderRadius: 8,
               flex: 1,
               marginLeft: onEdit ? 5 : 0,
-              alignItems: 'center',
-              borderWidth: 3, // เพิ่มขอบ
-              borderColor: 'yellow', // ขอบสีเหลือง
-              elevation: 10, // เพิ่ม shadow
-              zIndex: 1000 // ให้อยู่บนสุด
+              borderRadius: 12,
+              elevation: 3,
+              shadowColor: CyberPunkTheme.colors.error,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
             }}
-            activeOpacity={0.1} // ให้เห็นการกดชัดเจน
-            disabled={false} // แน่นอนว่าไม่ disable
+            activeOpacity={0.8}
             onPress={() => {
               console.warn('🔴🔴🔴 DELETE BUTTON PRESSED!');
               console.error('🔴🔴🔴 DELETE BUTTON PRESSED! (ERROR LOG)');
@@ -370,9 +437,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               handleDelete();
             }}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>
-              🗑️ ลบ DELETE TEST
-            </Text>
+            <LinearGradient
+              colors={[CyberPunkTheme.colors.error, '#CC0000']}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 12,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: CyberPunkTheme.colors.error + '40',
+              }}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <DeleteIcon size={18} color="white" />
+                <Text style={{ 
+                  color: 'white', 
+                  fontWeight: 'bold', 
+                  marginLeft: 6,
+                  fontSize: 14,
+                  textShadowColor: 'rgba(0,0,0,0.3)',
+                  textShadowOffset: { width: 1, height: 1 },
+                  textShadowRadius: 2,
+                }}>
+                  ลบ
+                </Text>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         )}
       </View>

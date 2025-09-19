@@ -1,6 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { CyberPunkTheme } from '../constants/theme';
+import { AddIcon, UserIcon } from './Icons';
 
 interface ActionButtonProps {
   onPress: () => void;
@@ -49,9 +50,20 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Text style={getTextStyle()}>
-        {icon && `${icon} `}{title}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {icon === '➕' && (
+          <AddIcon 
+            size={16} 
+            color={variant === 'secondary' ? CyberPunkTheme.colors.primary : CyberPunkTheme.colors.background} 
+          />
+        )}
+        {icon === '👤' && (
+          <UserIcon />
+        )}
+        <Text style={[getTextStyle(), { marginLeft: icon ? 6 : 0 }]}>
+          {title}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
