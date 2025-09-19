@@ -2,11 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LoginCredentials, AuthResponse } from '../types';
 import { mockAuthService } from './mockAuth';
 
-const BACKEND_URL = 'http://localhost:3006';
+const BACKEND_URL = 'http://119.59.102.61:3006';
 const TOKEN_KEY = 'inventory_auth_token';
 const USER_KEY = 'inventory_user';
 
-// Use mock authentication by default (เพื่อให้ได้ valid JWT token)
+// Use mock authentication but with valid backend token
 const USE_MOCK_AUTH = true;
 
 export const authService = {

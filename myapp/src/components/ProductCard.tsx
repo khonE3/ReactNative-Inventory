@@ -18,13 +18,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onEdit, 
   onDelete 
 }) => {
-  console.log('🃏 ProductCard render:', {
+  console.warn('🃏🃏🃏 ProductCard render:', {
     productName: product.name,
     productId: product.id,
     hasOnDelete: !!onDelete,
     hasOnEdit: !!onEdit,
-    hasOnPress: !!onPress
+    hasOnPress: !!onPress,
+    onDeleteType: typeof onDelete,
+    onDeleteValue: onDelete
   });
+  
+  console.error('🃏🃏🃏 ProductCard render (ERROR LOG):', product.name, 'DELETE?', !!onDelete);
+
+  // DEBUG: Check onDelete prop
+  React.useEffect(() => {
+    console.log('🚨 ProductCard useEffect - onDelete check:', {
+      productName: product.name,
+      hasOnDelete: !!onDelete,
+      onDeleteType: typeof onDelete
+    });
+  }, [product.name, onDelete]);
 
   // เพิ่ม Alert เพื่อ debug การ render
   React.useEffect(() => {
@@ -108,6 +121,33 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }
   };
 
+  const handleDelete = () => {
+    console.error('🚀🚀🚀 ProductCard: handleDelete called!');
+    console.error('🗑️ ProductCard: Product:', product.name, 'ID:', product.id);
+    console.error('🔍 ProductCard: onDelete exists?', !!onDelete);
+    console.error('🔍 ProductCard: onDelete type:', typeof onDelete);
+    console.error('⏰ ProductCard: Delete button clicked at:', new Date().toISOString());
+    
+    // Force alert to show progress
+    alert('handleDelete function called!');
+    
+    // SKIP Alert dialog - call onDelete directly for testing
+    console.error('🚀🚀🚀 ProductCard: SKIPPING Alert, calling onDelete directly!');
+    console.error('⏰ ProductCard: Direct call at:', new Date().toISOString());
+    console.error('📞 ProductCard: About to call onDelete function...');
+    
+    if (onDelete) {
+      console.error('✅✅✅ ProductCard: Calling onDelete with ID:', product.id);
+      alert('Calling onDelete function now...');
+      onDelete(product.id);
+      console.error('✅✅✅ ProductCard: onDelete function called');
+      alert('onDelete function called successfully!');
+    } else {
+      console.error('❌❌❌ ProductCard: No onDelete function provided');
+      alert('ERROR: No onDelete function provided!');
+    }
+  };
+
 
 
   console.log('🎯 ProductCard about to render with delete button:', !!onDelete);
@@ -117,15 +157,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     onDeleteExists: !!onDelete,
     buttonWillRender: !!(onEdit || onDelete)
   });
+  
+  // FORCE SHOW TEST BUTTON ALWAYS for debugging
+  console.log('🚨 DEBUGGING: onDelete =', onDelete);
+  console.log('🚨 DEBUGGING: Will render onDelete block?', !!onDelete);
 
   return (
     <View style={[inventoryStyles.productCard, { elevation: 8, shadowOpacity: 0.3 }]}>
-      {/* Invisible touchable overlay for card press - excludes button area */}
-      <TouchableOpacity 
-        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 60 }} // ไม่ครอบปุ่ม
+      {/* TEMPORARILY REMOVED: Invisible touchable overlay - might be blocking delete button */}
+      {/* <TouchableOpacity 
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 60 }}
         onPress={onPress}
         activeOpacity={0.9}
-      />
+      /> */}
       {/* Enhanced Glow Effect */}
       <LinearGradient
         colors={[
@@ -266,6 +310,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </View>
       </View>
 
+
+
       {/* Action Buttons */}
       <View style={{ 
         flexDirection: 'row', 
@@ -294,39 +340,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </TouchableOpacity>
         )}
         
-        {onDelete && (
+{(() => {
+          console.error('🔍 RENDER CHECK: onDelete exists?', !!onDelete);
+          console.error('🔍 RENDER CHECK: Product ID:', product.id, 'Name:', product.name);
+          console.error('🔍 RENDER CHECK: Will render delete button?', !!onDelete);
+          return onDelete;
+        })() && (
           <TouchableOpacity 
             style={{
-              backgroundColor: '#DC3545',
-              paddingHorizontal: 15,
-              paddingVertical: 8,
+              backgroundColor: 'red', // เปลี่ยนเป็นสีแดงเต็มๆ เพื่อให้เห็นชัด
+              paddingHorizontal: 20,
+              paddingVertical: 12,
               borderRadius: 8,
               flex: 1,
               marginLeft: onEdit ? 5 : 0,
-              alignItems: 'center'
+              alignItems: 'center',
+              borderWidth: 3, // เพิ่มขอบ
+              borderColor: 'yellow', // ขอบสีเหลือง
+              elevation: 10, // เพิ่ม shadow
+              zIndex: 1000 // ให้อยู่บนสุด
             }}
+            activeOpacity={0.1} // ให้เห็นการกดชัดเจน
+            disabled={false} // แน่นอนว่าไม่ disable
             onPress={() => {
-              Alert.alert(
-                '⚠️ ยืนยันการลบ',
-                `คุณต้องการลบสินค้า "${product.name}" หรือไม่?`,
-                [
-                  { text: 'ยกเลิก', style: 'cancel' },
-                  { 
-                    text: 'ลบ', 
-                    style: 'destructive',
-                    onPress: () => onDelete(product.id)
-                  }
-                ]
-              );
+              console.warn('🔴🔴🔴 DELETE BUTTON PRESSED!');
+              console.error('🔴🔴🔴 DELETE BUTTON PRESSED! (ERROR LOG)');
+              console.info('🔴🔴🔴 DELETE BUTTON PRESSED! (INFO LOG)');
+              alert('DELETE BUTTON PRESSED!'); // Force show alert
+              handleDelete();
             }}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>
-              🗑️ ลบ
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>
+              🗑️ ลบ DELETE TEST
             </Text>
           </TouchableOpacity>
         )}
       </View>
-
     </View>
   );
 };

@@ -216,56 +216,44 @@ export const useInventoryData = () => {
   }, [fetchData]);
 
   const deleteProduct = useCallback(async (id: number) => {
-    console.log('🚀 useInventoryData: deleteProduct function entry point');
-    console.log('📋 useInventoryData: Input parameters:', { id, type: typeof id });
-    console.log('🗑️ useInventoryData: deleteProduct called with ID:', id);
-    console.log('🔄 useInventoryData: Current state before delete:', {
-      productsCount: products.length,
-      loading,
-      error,
-      timestamp: new Date().toISOString()
-    });
+    console.log('🚀🚀🚀 HOOK: deleteProduct function called!');
+    console.log('📋 HOOK: Input ID:', id, 'Type:', typeof id);
+    console.log('⏰ HOOK: Delete function called at:', new Date().toISOString());
     
-    // Find the product being deleted for logging
-    const productToDelete = products.find(p => p.id === id);
-    console.log('🎯 useInventoryData: Product to delete:', productToDelete);
+    // Show console.warn to confirm hook function is called
+    console.warn('🚀🚀🚀 HOOK: deleteProduct function DEFINITELY called!');
+    console.warn('🚀🚀🚀 HOOK: This should be visible in console!');
     
+    const originalProducts = [...products];
+    const originalFilteredProducts = [...filteredProducts];
+
+    console.log('🔄 HOOK: Performing optimistic UI update...');
+    // Optimistic UI update
+    setProducts(prev => prev.filter(p => p.id !== id));
+    setFilteredProducts(prev => prev.filter(p => p.id !== id));
+    console.log('✅ HOOK: UI updated optimistically');
+
     try {
-      console.log('🧹 useInventoryData: Clearing error state...');
-      setError(null);
-      console.log('⏳ useInventoryData: Setting loading to true...');
-      setLoading(true); // Show loading during delete
-      console.log('📞 useInventoryData: About to call deleteProductAPI...');
+      console.log('📞 HOOK: About to call deleteProductAPI...');
+      console.log('📞 HOOK: deleteProductAPI function:', typeof deleteProductAPI);
       
-      // Call API to delete product from database
+      // Call API to delete
       await deleteProductAPI(id);
-      
-      console.log('✅ useInventoryData: API call successful, refreshing data...');
-      // Refresh data from database to ensure consistency
-      await fetchData();
-      
-      console.log('🎉 useInventoryData: Product deleted successfully:', id);
-      console.log('📊 useInventoryData: Products count after delete:', products.length);
+      console.log('✅ HOOK: Product deleted successfully from API');
     } catch (err) {
-      console.error('❌ useInventoryData: Delete product error:', err);
-      console.error('💥 useInventoryData: Error details:', {
-        message: err instanceof Error ? err.message : 'Unknown error',
-        stack: err instanceof Error ? err.stack : 'No stack trace',
-        type: typeof err,
-        timestamp: new Date().toISOString(),
-        productId: id,
-        productName: productToDelete?.name
-      });
+      console.error('❌ HOOK: Delete product error, reverting UI:', err);
+      console.error('❌ HOOK: Error type:', typeof err);
+      console.error('❌ HOOK: Error details:', err);
       
+      // Revert UI on error
+      setProducts(originalProducts);
+      setFilteredProducts(originalFilteredProducts);
+
       const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการลบสินค้า';
       setError(errorMessage);
-      console.log('🔔 useInventoryData: Error set to:', errorMessage);
-      throw err; // Re-throw for component error handling
-    } finally {
-      console.log('🏁 useInventoryData: Finally block - stopping loading...');
-      setLoading(false); // Stop loading
+      throw err; // Re-throw for component-level error handling
     }
-  }, [fetchData, products]);
+  }, [products, filteredProducts]);
 
   useEffect(() => {
     fetchData();

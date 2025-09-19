@@ -94,7 +94,13 @@ app.get('/api/ping', async (req, res) => {
 // Check database schema
 app.get('/api/check-schema', async (req, res) => {
   try {
+    console.log('🔍 Checking database schema...');
+    
+    // Get table columns
     const [columns] = await pool.query('DESCRIBE products');
+    const idColumn = columns.find(col => col.Field === 'id');
+    
+    // Get AUTO_INCREMENT info
     const [autoIncrementInfo] = await pool.query(`
       SELECT AUTO_INCREMENT 
       FROM information_schema.tables 
@@ -102,48 +108,220 @@ app.get('/api/check-schema', async (req, res) => {
       AND table_name = 'products'
     `);
     
+    // Get PRIMARY KEY info
+    const [primaryKeyInfo] = await pool.query(`
+      SELECT COLUMN_NAME
+      FROM information_schema.KEY_COLUMN_USAGE 
+      WHERE table_schema = DATABASE() 
+      AND table_name = 'products' 
+      AND CONSTRAINT_NAME = 'PRIMARY'
+    `);
+    
+    // Analyze issues
+    const issues = [];
+    const fixes = [];
+    
+    if (!idColumn) {
+      issues.push('id column not found');
+      fixes.push('CREATE id column');
+    } else {
+      if (idColumn.Key !== 'PRI') {
+        issues.push('id is not PRIMARY KEY');
+        fixes.push('ADD PRIMARY KEY (id)');
+      }
+      if (!idColumn.Extra?.includes('auto_increment')) {
+        issues.push('id does not have AUTO_INCREMENT');
+        fixes.push('MODIFY id to AUTO_INCREMENT');
+      }
+    }
+    
+    console.log('📊 Schema analysis:', { issues, fixes });
+    
     return res.json({
       columns: columns,
+      idColumn: idColumn,
       autoIncrement: autoIncrementInfo[0]?.AUTO_INCREMENT || 'Not set',
+      primaryKey: primaryKeyInfo.map(pk => pk.COLUMN_NAME),
+      issues: issues,
+      fixes: fixes,
+      needsFix: issues.length > 0,
       recommendations: {
-        needsAutoIncrement: !columns.find(col => col.Field === 'id')?.Extra?.includes('auto_increment'),
-        sqlFix: 'ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY;'
+        needsAutoIncrement: !idColumn?.Extra?.includes('auto_increment'),
+        needsPrimaryKey: idColumn?.Key !== 'PRI',
+        sqlFix: 'POST /api/fix-schema to automatically fix all issues'
       }
     });
   } catch (e) {
+    console.error('❌ Schema check error:', e);
     return res.status(500).json({ error: e.message });
   }
 });
 
-// Fix database schema endpoint
-app.post('/api/fix-schema', async (req, res) => {
+// Execute raw SQL endpoint (for manual fixes)
+app.post('/api/execute-sql', async (req, res) => {
   try {
-    // First, let's check if there are any existing records
-    const [existingRecords] = await pool.query('SELECT COUNT(*) as count FROM products');
+    const { sql, description } = req.body;
     
-    if (existingRecords[0].count > 0) {
-      // If there are existing records, we need to be more careful
-      await pool.query('ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY');
-    } else {
-      // If no records exist, we can safely modify the table
-      await pool.query('ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY');
+    if (!sql) {
+      return res.status(400).json({ error: 'SQL command is required' });
     }
     
-    // Verify the change
-    const [columns] = await pool.query('DESCRIBE products');
-    const idColumn = columns.find(col => col.Field === 'id');
+    console.log('🔧 Executing SQL:', description || 'Manual SQL command');
+    console.log('📝 SQL:', sql);
+    
+    const result = await pool.query(sql);
+    console.log('✅ SQL executed successfully');
     
     return res.json({
       success: true,
-      message: 'Database schema fixed successfully',
-      idColumn: idColumn
+      message: `SQL executed successfully: ${description || sql}`,
+      result: result[0]
     });
   } catch (e) {
-    console.error('Schema Fix Error:', e);
+    console.error('❌ SQL execution error:', e);
+    return res.status(500).json({
+      error: 'Failed to execute SQL',
+      details: e.message,
+      sqlError: e.code,
+      sqlState: e.sqlState
+    });
+  }
+});
+
+// Test DELETE endpoint (for debugging)
+app.post('/api/test-delete/:id', authToken, async (req, res) => {
+  const { id } = req.params;
+  console.log('🧪🧪🧪 TEST DELETE ENDPOINT CALLED!');
+  console.log('🧪 Test delete for product ID:', id);
+  console.log('🧪 Headers:', req.headers);
+  console.log('🧪 User:', req.user);
+  
+  try {
+    // Check if product exists
+    const [found] = await pool.query('SELECT id, name FROM products WHERE id = ?', [id]);
+    
+    if (found.length === 0) {
+      console.log('🧪 Product not found with ID:', id);
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    console.log('🧪 Product found:', found[0]);
+    
+    // Actually delete the product
+    const [deleteResult] = await pool.query('DELETE FROM products WHERE id = ?', [id]);
+    console.log('🧪 Delete result:', deleteResult);
+    
+    return res.json({
+      success: true,
+      message: 'Test delete successful',
+      productId: id,
+      deletedProduct: found[0],
+      deleteResult: deleteResult
+    });
+  } catch (e) {
+    console.error('🧪 Test delete error:', e);
+    return res.status(500).json({
+      error: 'Test delete failed',
+      details: e.message
+    });
+  }
+});
+
+// Fix database schema endpoint  
+app.post('/api/fix-schema', async (req, res) => {
+  try {
+    console.log('🔧 Starting database schema fix...');
+    
+    // Check current schema
+    const [columns] = await pool.query('DESCRIBE products');
+    const idColumn = columns.find(col => col.Field === 'id');
+    console.log('📋 Current id column:', idColumn);
+    
+    // Check all indexes and constraints
+    const [indexes] = await pool.query(`SHOW INDEX FROM products`);
+    console.log('📋 All indexes:', indexes);
+    
+    // Check if there are any existing records
+    const [existingRecords] = await pool.query('SELECT COUNT(*) as count FROM products');
+    console.log('📊 Existing records count:', existingRecords[0].count);
+    
+    // Check current AUTO_INCREMENT status
+    const hasAutoIncrement = idColumn?.Extra?.includes('auto_increment');
+    console.log('🔍 id has AUTO_INCREMENT:', hasAutoIncrement);
+    
+    if (!hasAutoIncrement) {
+      console.log('🔧 Need to add AUTO_INCREMENT to id column');
+      
+      // Method 1: Try direct modification without touching constraints
+      try {
+        console.log('🔧 Attempting to modify id column directly...');
+        await pool.query('ALTER TABLE products MODIFY COLUMN id INT NOT NULL AUTO_INCREMENT');
+        console.log('✅ Successfully added AUTO_INCREMENT to id column');
+        
+        // Set proper starting value if needed
+        if (existingRecords[0].count > 0) {
+          const [maxId] = await pool.query('SELECT MAX(id) as maxId FROM products');
+          const nextId = (maxId[0].maxId || 0) + 1;
+          await pool.query(`ALTER TABLE products AUTO_INCREMENT = ${nextId}`);
+          console.log(`✅ Set AUTO_INCREMENT to start from ${nextId}`);
+        }
+        
+      } catch (directError) {
+        console.log('⚠️ Direct modification failed:', directError.message);
+        
+        // Method 2: Manual SQL approach
+        console.log('🔧 Trying alternative approach...');
+        
+        // Get max ID first
+        let nextId = 1;
+        if (existingRecords[0].count > 0) {
+          const [maxId] = await pool.query('SELECT MAX(id) as maxId FROM products');
+          nextId = (maxId[0].maxId || 0) + 1;
+        }
+        
+        // Execute raw SQL
+        const alterSQL = `ALTER TABLE products MODIFY id INT NOT NULL AUTO_INCREMENT PRIMARY KEY`;
+        console.log('🔧 Executing SQL:', alterSQL);
+        await pool.query(alterSQL);
+        
+        // Set AUTO_INCREMENT start value
+        await pool.query(`ALTER TABLE products AUTO_INCREMENT = ${nextId}`);
+        console.log(`✅ Set AUTO_INCREMENT to start from ${nextId}`);
+      }
+      
+      // Verify the changes
+      const [newColumns] = await pool.query('DESCRIBE products');
+      const newIdColumn = newColumns.find(col => col.Field === 'id');
+      console.log('📋 Updated id column:', newIdColumn);
+      
+      return res.json({
+        success: true,
+        message: 'Database schema fixed successfully - AUTO_INCREMENT added',
+        changes: {
+          before: idColumn,
+          after: newIdColumn,
+          recordCount: existingRecords[0].count
+        }
+      });
+    } else {
+      console.log('ℹ️ id already has AUTO_INCREMENT, no changes needed');
+      return res.json({
+        success: true,
+        message: 'Database schema is already correct - no changes needed',
+        idColumn: idColumn,
+        recordCount: existingRecords[0].count
+      });
+    }
+    
+  } catch (e) {
+    console.error('❌ Schema Fix Error:', e);
     return res.status(500).json({ 
       error: 'Failed to fix schema', 
       details: e.message,
-      suggestion: 'Please run this SQL command manually in your database: ALTER TABLE products MODIFY COLUMN id INT AUTO_INCREMENT PRIMARY KEY;'
+      sqlError: e.code,
+      sqlState: e.sqlState,
+      errno: e.errno,
+      suggestion: 'Please try running this SQL manually: ALTER TABLE products MODIFY id INT NOT NULL AUTO_INCREMENT;'
     });
   }
 });
@@ -490,27 +668,74 @@ app.put('/api/products/:id', authToken, async (req, res) => {
 
 // DELETE /api/products/:id
 app.delete('/api/products/:id', authToken, async (req, res) => {
-  console.log('Delete request for id:', req.params.id);
+  console.log('🚨🚨🚨 DELETE ENDPOINT HIT! 🚨🚨🚨');
+  console.log('⏰ Request timestamp:', new Date().toISOString());
+  const { id } = req.params;
+  console.log('🗑️ DELETE request received for product ID:', id);
+  console.log('📋 Full request details:', {
+    method: req.method,
+    url: req.url,
+    params: req.params,
+    headers: Object.keys(req.headers),
+    body: req.body
+  });
+  console.log('🔍 Request headers:', JSON.stringify(req.headers, null, 2));
+  console.log('👤 Authenticated user:', req.user?.username);
+  
   try {
-    const { id } = req.params;
+    // Check if product exists
+    console.log('🔍 Checking if product exists...');
     const [found] = await pool.query(
-      'SELECT id FROM products WHERE id = ?',
+      'SELECT id, name FROM products WHERE id = ?',
       [id]
     );
+    
     if (found.length === 0) {
+      console.log('❌ Product not found with ID:', id);
       return res.status(404).json({ error: 'Product not found' });
     }
-    console.log('Attempting to delete product with id:', id);
-    await pool.query('DELETE FROM products WHERE id = ?', [id]);
-    return res.json({ success: true, productId: id });
+    
+    const productName = found[0].name;
+    console.log('✅ Product found:', productName, '(ID:', id, ')');
+    
+    // Perform deletion
+    console.log('🗑️ Attempting to delete product from database...');
+    const [deleteResult] = await pool.query('DELETE FROM products WHERE id = ?', [id]);
+    
+    console.log('📊 Delete result:', {
+      affectedRows: deleteResult.affectedRows,
+      changedRows: deleteResult.changedRows,
+      insertId: deleteResult.insertId
+    });
+    
+    if (deleteResult.affectedRows === 0) {
+      console.log('⚠️ No rows affected during deletion');
+      return res.status(404).json({ error: 'Product not found or already deleted' });
+    }
+    
+    console.log('✅ Product deleted successfully:', productName, '(ID:', id, ')');
+    return res.json({ 
+      success: true, 
+      productId: id,
+      message: `Product "${productName}" deleted successfully`
+    });
+    
   } catch (e) {
-    console.error('Delete Product Error:', {
+    console.error('❌ Delete Product Error:', {
       message: e.message,
       stack: e.stack,
+      productId: id,
       params: req.params,
       time: new Date().toISOString(),
+      sqlState: e.sqlState,
+      errno: e.errno,
+      code: e.code
     });
-    return res.status(500).json({ error: 'Failed to delete product', details: e.message });
+    return res.status(500).json({ 
+      error: 'Failed to delete product', 
+      details: e.message,
+      productId: id
+    });
   }
 });
 

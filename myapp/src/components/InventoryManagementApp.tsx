@@ -24,7 +24,8 @@ import { CyberPunkTheme } from '../constants';
 import { Product, ProductFormData } from '../types';
 
 export const InventoryManagementApp = () => {
-  console.log('🏠 InventoryManagementApp component rendered');
+  console.log('🏠🏠🏠 InventoryManagementApp RENDERING!');
+  console.log('📱 CONSOLE LOG TEST - InventoryManagementApp is rendering!');
   const { user, logout } = useAuth();
   const {
     products,
@@ -47,6 +48,13 @@ export const InventoryManagementApp = () => {
 
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  
+  // DEBUG: Check handleDeleteProduct on mount
+  React.useEffect(() => {
+    console.log('🧪 InventoryManagementApp mounted');
+    console.log('🧪 handleDeleteProduct available:', !!deleteProduct);
+    console.log('🧪 handleDeleteProduct type:', typeof deleteProduct);
+  }, [deleteProduct]);
   const [formMode, setFormMode] = useState<'add' | 'edit' | 'view'>('add');
 
   const inventoryStats = getStockStatistics();
@@ -64,17 +72,25 @@ export const InventoryManagementApp = () => {
   };
 
   const handleDeleteProduct = async (productId: number) => {
-    console.log('🚀 MAIN APP: handleDeleteProduct function called!');
+    console.log('🚀🚀🚀 MAIN APP: handleDeleteProduct function CALLED!');
     console.log('🔄 InventoryManagementApp: handleDeleteProduct called with ID:', productId);
+    console.log('🕐 MAIN APP: Function called at:', new Date().toISOString());
+    console.log('🎯 MAIN APP: deleteProduct function exists?', !!deleteProduct);
+    console.log('🎯 MAIN APP: deleteProduct type:', typeof deleteProduct);
+    console.log('🔍 MAIN APP: deleteProduct function:', deleteProduct);
     
     // Find product name for better user experience
     const productName = products.find(p => p.id === productId)?.name || `ID: ${productId}`;
     console.log('🎯 MAIN APP: Deleting product:', productName);
     
     try {
-      console.log('📞 MAIN APP: Calling deleteProduct function...');
+      console.log('📞 MAIN APP: About to call deleteProduct function...');
+      console.log('🎯 MAIN APP: deleteProduct reference:', deleteProduct);
+      console.log('📋 MAIN APP: productId to delete:', productId);
+      
+      console.log('🚀 MAIN APP: CALLING deleteProduct NOW!');
       await deleteProduct(productId);
-      console.log('✅ MAIN APP: Delete successful');
+      console.log('✅ MAIN APP: Delete successful - deleteProduct returned');
       
       // Show success alert
       Alert.alert(
@@ -148,13 +164,19 @@ export const InventoryManagementApp = () => {
   };
 
   const renderProductCard = ({ item }: { item: Product }) => {
-    console.log('🎯 Rendering ProductCard for:', item.name, 'with onDelete:', !!handleDeleteProduct);
+    console.log('🎯🎯🎯 RENDERING ProductCard for:', item.name);
     console.log('🎯 Product details:', {
       id: item.id,
       name: item.name,
       hasDeleteHandler: !!handleDeleteProduct,
-      deleteHandler: typeof handleDeleteProduct
+      deleteHandler: typeof handleDeleteProduct,
+      handleDeleteProductFunction: handleDeleteProduct
     });
+    console.warn('🎯 About to pass onDelete to ProductCard:', !!handleDeleteProduct);
+    console.warn('🎯 RENDER ProductCard for:', item.name, 'with onDelete:', !!handleDeleteProduct);
+    console.warn('🎯 deleteProduct from hook:', !!deleteProduct, typeof deleteProduct);
+    console.error('🎯 PASSING onDelete to ProductCard (ERROR LOG):', item.name, !!handleDeleteProduct);
+    
     return (
       <ProductCard
         product={item}
