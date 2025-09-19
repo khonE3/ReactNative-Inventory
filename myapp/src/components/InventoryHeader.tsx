@@ -2,8 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { inventoryStyles } from '../styles/inventory';
 import { CyberPunkTheme } from '../constants';
-import { ExportButton } from './ExportButton';
-import { Product } from '../types';
 
 interface InventoryHeaderProps {
   totalProducts: number;
@@ -11,7 +9,6 @@ interface InventoryHeaderProps {
   lowStockProducts: number;
   totalValue: number;
   lastUpdated: string;
-  products?: Product[]; // เพิ่ม products สำหรับ export
 }
 
 export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
@@ -19,8 +16,7 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
   activeProducts,
   lowStockProducts,
   totalValue,
-  lastUpdated,
-  products = []
+  lastUpdated
 }) => {
   const formatCurrency = (amount: number): string => {
     return amount.toLocaleString('th-TH', {
@@ -38,14 +34,6 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
           <Text style={inventoryStyles.headerTitle}>
             ระบบจัดการสินค้าไซเบอร์
           </Text>
-        </View>
-        
-        {/* Export Button */}
-        <View style={{ marginLeft: 15 }}>
-          <ExportButton 
-            products={products} 
-            disabled={products.length === 0}
-          />
         </View>
       </View>
       

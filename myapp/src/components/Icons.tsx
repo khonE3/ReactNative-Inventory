@@ -71,3 +71,7 @@ export const ViewIcon = ({ size = 20, color = CyberPunkTheme.colors.primary }: I
 export const BrandIcon = ({ size = 20, color = CyberPunkTheme.colors.primary }: IconProps) => (
   <Ionicons name="ribbon" size={size} color={color} />
 );
+
+export const SQLExportIcon = ({ size = 20, color = CyberPunkTheme.colors.neonGreen }: IconProps) => (
+  <Ionicons name="server" size={size} color={color} />
+);

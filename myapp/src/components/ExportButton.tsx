@@ -65,39 +65,19 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         end={{ x: 1, y: 1 }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          {isExporting ? (
-            <>
-              <Ionicons 
-                name="sync-outline" 
-                size={18} 
-                color={CyberPunkTheme.colors.background}
-                style={{ marginRight: 8 }} 
-              />
-              <Text style={{
-                color: CyberPunkTheme.colors.background,
-                fontSize: 14,
-                fontWeight: '600',
-              }}>
-                กำลังส่งออก...
-              </Text>
-            </>
-          ) : (
-            <>
-              <Ionicons 
-                name="download-outline" 
-                size={18} 
-                color={CyberPunkTheme.colors.background}
-                style={{ marginRight: 8 }}
-              />
-              <Text style={{
-                color: CyberPunkTheme.colors.background,
-                fontSize: 14,
-                fontWeight: '600',
-              }}>
-                ส่งออกข้อมูล
-              </Text>
-            </>
-          )}
+          <Ionicons 
+            name="download-outline" 
+            size={18} 
+            color={CyberPunkTheme.colors.background}
+            style={{ marginRight: 8 }}
+          />
+          <Text style={{
+            color: CyberPunkTheme.colors.background,
+            fontSize: 14,
+            fontWeight: '600',
+          }}>
+            ส่งออกข้อมูล
+          </Text>
         </View>
       </LinearGradient>
     </TouchableOpacity>

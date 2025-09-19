@@ -224,7 +224,6 @@ export const InventoryManagementApp = () => {
               lowStockProducts={inventoryStats.lowStockProducts}
               totalValue={inventoryStats.totalValue}
               lastUpdated={lastUpdated}
-              products={products}
             />
             
             <SearchBar
@@ -238,27 +237,6 @@ export const InventoryManagementApp = () => {
               onCategorySelect={handleCategoryFilter}
             />
 
-            {/* SQL Export Test Button - Development Only */}
-            {__DEV__ && (
-              <View style={{ padding: 10, backgroundColor: '#ffffcc', margin: 10, borderRadius: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ActionButton
-                  title={`🧪 SQL Export (${products.length} รายการ)`}
-                  onPress={async () => {
-                    try {
-                      console.log('🧪 Testing SQL export with', products.length, 'products');
-                      Alert.alert('🧪 Debug Info', `กำลังทดสอบ SQL Export\nจำนวนสินค้า: ${products.length} รายการ\nเปิด Console เพื่อดู logs`);
-                      const { ExportService } = await import('../services/exportService');
-                      await ExportService.exportToSQL(products);
-                    } catch (error) {
-                      console.error('❌ SQL Export test failed:', error);
-                      Alert.alert('ข้อผิดพลาด', `ทดสอบ SQL Export ล้มเหลว: ${error}`);
-                    }
-                  }}
-                  variant="secondary"
-                />
-              </View>
-            )}
-
             {/* Action Buttons */}
             <View style={styles.actionButtonsContainer}>
               <ActionButton
@@ -267,6 +245,32 @@ export const InventoryManagementApp = () => {
                 onPress={handleAddProduct}
                 variant="primary"
               />
+{__DEV__ ? (
+                <ActionButton
+                  title={`SQL Export (${products.length})`}
+                  icon="🗃️"
+                  onPress={async () => {
+                    try {
+                      console.log('🗃️ Starting SQL export with', products.length, 'products');
+                      const { ExportService } = await import('../services/exportService');
+                      await ExportService.exportToSQL(products);
+                    } catch (error) {
+                      console.error('❌ SQL Export failed:', error);
+                      Alert.alert('ข้อผิดพลาด', `ไม่สามารถส่งออก SQL ได้: ${error}`);
+                    }
+                  }}
+                  variant="success"
+                />
+              ) : (
+                <ActionButton
+                  title="เครื่องมือ"
+                  icon="🗃️"
+                  onPress={() => {
+                    Alert.alert('ข้อมูล', 'เครื่องมือพิเศษจะพร้อมใช้งานเร็วๆ นี้');
+                  }}
+                  variant="success"
+                />
+              )}
               <ActionButton
                 title={`สวัสดี ${user?.username}`}
                 icon="👤"
@@ -319,8 +323,9 @@ export const InventoryManagementApp = () => {
 const styles = StyleSheet.create({
   actionButtonsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    gap: 8,
+    alignItems: 'stretch',
   },
 });

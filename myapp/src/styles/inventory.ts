@@ -66,9 +66,9 @@ export const inventoryStyles = StyleSheet.create({
   // Search & Filter Styles
   searchContainer: {
     flexDirection: 'row',
-    margin: 16,
+    margin: 12,
     marginTop: 0,
-    gap: 10,
+    gap: 8,
   },
   searchInput: {
     flex: 1,
@@ -94,8 +94,8 @@ export const inventoryStyles = StyleSheet.create({
   
   // Category Filter Styles
   categoryContainer: {
-    paddingHorizontal: 16,
-    marginBottom: 10,
+    paddingHorizontal: 12,
+    marginBottom: 4,
   },
   categoryScrollView: {
     paddingVertical: 5,
