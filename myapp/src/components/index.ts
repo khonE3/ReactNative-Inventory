@@ -10,6 +10,7 @@ export { SearchBar } from './SearchBar';
 export { EmptyInventoryState } from './EmptyInventoryState';
 export { ProductForm } from './ProductForm';
 export { ActionButton } from './ActionButton';
+export { ExportButton } from './ExportButton';
 export { InventoryManagementApp } from './InventoryManagementApp';
 
 // Auth Components
