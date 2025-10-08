@@ -6,8 +6,8 @@
 -- ==========================================
 
 -- Create database if not exists
-CREATE DATABASE IF NOT EXISTS `inventory_std6630202015`;
-USE `inventory_std6630202015`;
+CREATE DATABASE IF NOT EXISTS `inventory_std6630202252`;
+USE `inventory_std6630202252`;
 
 -- Drop table if exists
 DROP TABLE IF EXISTS `products`;

@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 3006;
+const PORT = process.env.PORT || 3018;
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_in_.env';
 
 // ---------- Middlewares ----------
