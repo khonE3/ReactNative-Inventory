@@ -224,6 +224,8 @@ export const InventoryManagementApp = () => {
               lowStockProducts={inventoryStats.lowStockProducts}
               totalValue={inventoryStats.totalValue}
               lastUpdated={lastUpdated}
+              products={products}
+              onRefresh={onRefresh}
             />
             
             <SearchBar
