@@ -52,13 +52,13 @@ export const SQLExportTest: React.FC = () => {
     let sql = `-- ==========================================
 -- SQL Export: Inventory Database
 -- Generated: ${currentDate}
--- Student ID: std6630202015
+-- Student ID: std6630202252
 -- Total Products: ${products.length}
 -- ==========================================
 
 -- Create database if not exists
-CREATE DATABASE IF NOT EXISTS \`inventory_std6630202015\`;
-USE \`inventory_std6630202015\`;
+CREATE DATABASE IF NOT EXISTS \`inventory_std6630202252\`;
+USE \`inventory_std6630202252\`;
 
 -- Drop table if exists
 DROP TABLE IF EXISTS \`products\`;
@@ -137,7 +137,7 @@ INSERT INTO \`products\` (
     try {
       console.log('🧪 Starting SQL export test...');
       
-      const fileName = 'std6630202015.sql';
+      const fileName = 'std6630202252.sql';
       const sqlContent = generateSQLContent(testProducts);
       
       console.log('📝 Generated SQL content length:', sqlContent.length);
@@ -204,7 +204,7 @@ INSERT INTO \`products\` (
       </TouchableOpacity>
       
       <Text style={{ marginTop: 15, fontSize: 14, color: '#666' }}>
-        จะสร้างไฟล์ std6630202015.sql พร้อมข้อมูลทดสอบ {testProducts.length} รายการ
+        จะสร้างไฟล์ std6630202252.sql พร้อมข้อมูลทดสอบ {testProducts.length} รายการ
       </Text>
     </View>
   );
