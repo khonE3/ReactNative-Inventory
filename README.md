@@ -131,7 +131,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const port = 3006;
+const port = 3018;
 
 app.use(cors());
 app.use(express.json());
@@ -139,7 +139,7 @@ app.use(express.json());
 // API Endpoint สำหรับดึงข้อมูลสินค้า
 app.get('/api/products', async (req, res) => {
   try {
-    const response = await axios.get('http://nindam.sytes.net/std6630202015/Inventory/info.json');
+    const response = await axios.get('http://nindam.sytes.net/std6630202252/Inventory/info.json');
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching products:', error.message);
@@ -414,7 +414,7 @@ npm install
 ```bash
 cd backend
 npm start
-# Server จะรันที่ http://localhost:3006
+# Server จะรันที่ http://localhost:3018
 ```
 
 4. **รัน Frontend:**
