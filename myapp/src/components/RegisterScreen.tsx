@@ -29,34 +29,69 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
+    // Validate empty fields
     if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
-      Alert.alert('ข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+      Alert.alert(
+        '❌ ข้อมูลไม่ครบถ้วน',
+        'กรุณากรอกข้อมูลให้ครบทุกช่อง',
+        [{ text: 'ตกลง', style: 'default' }]
+      );
       return;
     }
 
+    // Validate password match
     if (password !== confirmPassword) {
-      Alert.alert('ข้อผิดพลาด', 'รหัสผ่านไม่ตรงกัน');
+      Alert.alert(
+        '⚠️ รหัสผ่านไม่ตรงกัน',
+        'กรุณาตรวจสอบรหัสผ่านและยืนยันรหัสผ่านให้ตรงกัน',
+        [{ text: 'ตกลง', style: 'default' }]
+      );
       return;
     }
 
+    // Validate password length
     if (password.length < 6) {
-      Alert.alert('ข้อผิดพลาด', 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+      Alert.alert(
+        '⚠️ รหัสผ่านสั้นเกินไป',
+        'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร',
+        [{ text: 'ตกลง', style: 'default' }]
+      );
       return;
     }
 
     try {
       setIsLoading(true);
       
+      // Register user
       await authService.register(username.trim(), password, 'user');
 
+      // Success alert with callback
       Alert.alert(
-        'ลงทะเบียนสำเร็จ',
-        'คุณสามารถเข้าสู่ระบบได้แล้ว',
-        [{ text: 'ตกลง', onPress: onRegisterSuccess }]
+        '✅ สร้างบัญชีสำเร็จ!',
+        `ยินดีต้อนรับ ${username}!\nคุณสามารถเข้าสู่ระบบได้แล้ว 🎉`,
+        [
+          {
+            text: 'เข้าสู่ระบบเลย',
+            style: 'default',
+            onPress: () => {
+              // Clear form
+              setUsername('');
+              setPassword('');
+              setConfirmPassword('');
+              // Navigate to login
+              onRegisterSuccess();
+            }
+          }
+        ],
+        { cancelable: false } // Prevent dismissing by tapping outside on Android
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาด';
-      Alert.alert('ลงทะเบียนไม่สำเร็จ', errorMessage);
+      const errorMessage = error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการสร้างบัญชี';
+      Alert.alert(
+        '❌ ลงทะเบียนไม่สำเร็จ',
+        errorMessage,
+        [{ text: 'ลองอีกครั้ง', style: 'default' }]
+      );
     } finally {
       setIsLoading(false);
     }

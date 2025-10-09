@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { useAuth } from '../hooks/useAuth';
 import CafeTheme from '../constants/cafeTheme';
@@ -21,6 +22,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister }) 
   const [username, setUsername] = useState('testD');
   const [password, setPassword] = useState('123456');
   const { login, isLoading, error } = useAuth();
+  const { width } = useWindowDimensions();
+  
+  // Responsive sizing
+  const isSmallScreen = width < 400;
+  const isMediumScreen = width >= 400 && width < 768;
+  const isLargeScreen = width >= 768;
 
   const handleLogin = async () => {
     if (!username.trim() || !password.trim()) {
@@ -41,6 +48,24 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister }) 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={[
+            styles.title,
+            isSmallScreen && styles.titleSmall,
+            isMediumScreen && styles.titleMedium,
+            isLargeScreen && styles.titleLarge,
+          ]}>
+            🐱☕ Inventory Management System
+          </Text>
+          <Text style={[
+            styles.subtitle,
+            isSmallScreen && styles.subtitleSmall,
+          ]}>
+            ระบบจัดการสินค้า
+          </Text>
+        </View>
+
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>ชื่อผู้ใช้</Text>
@@ -109,6 +134,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: CafeTheme.typography.weights.bold,
+    color: CafeTheme.colors.primary,
+    textAlign: 'center',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+    textShadowColor: CafeTheme.colors.primary,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
+  titleSmall: {
+    fontSize: 20,
+    letterSpacing: 0.3,
+  },
+  titleMedium: {
+    fontSize: 28,
+    letterSpacing: 0.5,
+  },
+  titleLarge: {
+    fontSize: 36,
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: CafeTheme.typography.weights.medium,
+    color: CafeTheme.colors.textSecondary,
+    textAlign: 'center',
+    letterSpacing: 0.3,
+  },
+  subtitleSmall: {
+    fontSize: 12,
   },
   form: {
     width: '100%',
