@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, Alert, Platform } from 'react-native';
 import { Product } from '../types';
 import { inventoryStyles } from '../styles/inventory';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { WarningIcon, PackageIcon, CategoryIcon, LocationIcon, CompanyIcon, EditIcon, DeleteIcon, BrandIcon } from './Icons';
 
@@ -88,14 +88,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     switch (status?.toLowerCase()) {
       case 'active':
       case 'in_stock':
-        return CyberPunkTheme.colors.success;
+        return CafeTheme.colors.success;
       case 'inactive':
       case 'out_of_stock':
-        return CyberPunkTheme.colors.error;
+        return CafeTheme.colors.error;
       case 'low_stock':
-        return CyberPunkTheme.colors.warning;
+        return CafeTheme.colors.warning;
       default:
-        return CyberPunkTheme.colors.textSecondary;
+        return CafeTheme.colors.textSecondary;
     }
   };
 
@@ -174,8 +174,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Enhanced Glow Effect */}
       <LinearGradient
         colors={[
-          CyberPunkTheme.colors.primary + '20',
-          CyberPunkTheme.colors.primary + '05',
+          CafeTheme.colors.primary + '20',
+          CafeTheme.colors.primary + '05',
           'transparent'
         ]}
         style={inventoryStyles.productGlow}
@@ -186,8 +186,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         style={[
           inventoryStyles.statusIndicator,
           isActive ? 
-            { backgroundColor: CyberPunkTheme.colors.success, shadowColor: CyberPunkTheme.colors.success, shadowOpacity: 0.6, shadowRadius: 4 } : 
-            { backgroundColor: CyberPunkTheme.colors.error, shadowColor: CyberPunkTheme.colors.error, shadowOpacity: 0.6, shadowRadius: 4 }
+            { backgroundColor: CafeTheme.colors.success, shadowColor: CafeTheme.colors.success, shadowOpacity: 0.6, shadowRadius: 4 } : 
+            { backgroundColor: CafeTheme.colors.error, shadowColor: CafeTheme.colors.error, shadowOpacity: 0.6, shadowRadius: 4 }
         ]} 
       />
 
@@ -200,13 +200,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           zIndex: 10,
           borderRadius: 20,
           elevation: 6,
-          shadowColor: CyberPunkTheme.colors.warning,
+          shadowColor: CafeTheme.colors.warning,
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.4,
           shadowRadius: 5,
         }}>
           <LinearGradient
-            colors={[CyberPunkTheme.colors.warning, CyberPunkTheme.colors.neonOrange]}
+            colors={[CafeTheme.colors.warning, CafeTheme.colors.dog]}
             style={{
               paddingHorizontal: 12,
               paddingVertical: 6,
@@ -247,10 +247,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           />
         ) : (
           <LinearGradient
-            colors={[CyberPunkTheme.colors.surfaceLight, CyberPunkTheme.colors.surface]}
+            colors={[CafeTheme.colors.surfaceLight, CafeTheme.colors.surface]}
             style={[inventoryStyles.productImagePlaceholder, { borderRadius: 10 }]}
           >
-            <PackageIcon size={40} color={CyberPunkTheme.colors.textMuted} />
+            <PackageIcon size={40} color={CafeTheme.colors.textMuted} />
           </LinearGradient>
         )}
       </View>
@@ -261,15 +261,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {product.name}
         </Text>
         
-        <View style={{ backgroundColor: CyberPunkTheme.colors.primary + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, marginVertical: 4, alignSelf: 'flex-start' }}>
-          <Text style={[inventoryStyles.productCode, { fontSize: 11, color: CyberPunkTheme.colors.primary, fontWeight: '600' }]}>
+        <View style={{ backgroundColor: CafeTheme.colors.primary + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, marginVertical: 4, alignSelf: 'flex-start' }}>
+          <Text style={[inventoryStyles.productCode, { fontSize: 11, color: CafeTheme.colors.primary, fontWeight: '600' }]}>
             {product.productCode}
           </Text>
         </View>
         
         <LinearGradient
-          colors={[CyberPunkTheme.colors.primary + '30', CyberPunkTheme.colors.primary + '15']}
-          style={[inventoryStyles.categoryBadge, { borderRadius: 12, borderWidth: 1, borderColor: CyberPunkTheme.colors.primary + '40' }]}
+          colors={[CafeTheme.colors.primary + '30', CafeTheme.colors.primary + '15']}
+          style={[inventoryStyles.categoryBadge, { borderRadius: 12, borderWidth: 1, borderColor: CafeTheme.colors.primary + '40' }]}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CategoryIcon size={14} color="#D2B48C" />
@@ -281,9 +281,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </View>
 
       {/* Enhanced Price and Stock */}
-      <View style={[inventoryStyles.bottomInfo, { backgroundColor: CyberPunkTheme.colors.surface + '80', borderRadius: 8, margin: 8, padding: 8, elevation: 2 }]}>
+      <View style={[inventoryStyles.bottomInfo, { backgroundColor: CafeTheme.colors.surface + '80', borderRadius: 8, margin: 8, padding: 8, elevation: 2 }]}>
         <View style={inventoryStyles.priceSection}>
-          <Text style={[inventoryStyles.productPrice, { fontSize: 18, fontWeight: 'bold', color: CyberPunkTheme.colors.primary }]}>
+          <Text style={[inventoryStyles.productPrice, { fontSize: 18, fontWeight: 'bold', color: CafeTheme.colors.primary }]}>
             ฿{formatPrice(product.price)}
           </Text>
           <Text style={[inventoryStyles.productUnit, { fontSize: 11 }]}>
@@ -297,7 +297,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             { 
               fontSize: 16, 
               fontWeight: 'bold',
-              color: isLowStock ? CyberPunkTheme.colors.error : CyberPunkTheme.colors.success 
+              color: isLowStock ? CafeTheme.colors.error : CafeTheme.colors.success 
             }
           ]}>
             {formatStock(product.stock)}
@@ -307,10 +307,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </View>
 
       {/* Enhanced Location and Brand */}
-      <View style={[inventoryStyles.additionalInfo, { backgroundColor: CyberPunkTheme.colors.surfaceLight + '50', borderRadius: 6, margin: 8, padding: 6 }]}>
+      <View style={[inventoryStyles.additionalInfo, { backgroundColor: CafeTheme.colors.surfaceLight + '50', borderRadius: 6, margin: 8, padding: 6 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-            <LocationIcon size={12} color={CyberPunkTheme.colors.textSecondary} />
+            <LocationIcon size={12} color={CafeTheme.colors.textSecondary} />
             <Text style={[inventoryStyles.locationText, { fontSize: 11, marginLeft: 4 }]}>
               {product.location}
             </Text>
@@ -318,7 +318,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-            <BrandIcon size={12} color={CyberPunkTheme.colors.textSecondary} />
+            <BrandIcon size={12} color={CafeTheme.colors.textSecondary} />
             <Text style={[inventoryStyles.brandText, { fontSize: 11, marginLeft: 4 }]}>
               {product.brand}
             </Text>
@@ -327,7 +327,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </View>
 
       {/* Enhanced Status and Last Update */}
-      <View style={[inventoryStyles.statusUpdateInfo, { backgroundColor: CyberPunkTheme.colors.background + '80', borderRadius: 6, margin: 8, padding: 6 }]}>
+      <View style={[inventoryStyles.statusUpdateInfo, { backgroundColor: CafeTheme.colors.background + '80', borderRadius: 6, margin: 8, padding: 6 }]}>
         <View style={[inventoryStyles.statusInfo, { marginBottom: 2 }]}>
           <Text style={[inventoryStyles.statusLabel, { fontSize: 10, fontWeight: '600' }]}>สถานะ:</Text>
           <View style={{ 
@@ -372,7 +372,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               marginRight: onDelete ? 5 : 0,
               borderRadius: 12,
               elevation: 3,
-              shadowColor: CyberPunkTheme.colors.neonPink,
+              shadowColor: CafeTheme.colors.cat,
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.3,
               shadowRadius: 4,
@@ -381,14 +381,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={[CyberPunkTheme.colors.neonPink, CyberPunkTheme.colors.neonPink + 'CC']}
+              colors={[CafeTheme.colors.cat, CafeTheme.colors.cat + 'CC']}
               style={{
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 borderRadius: 12,
                 alignItems: 'center',
                 borderWidth: 1,
-                borderColor: CyberPunkTheme.colors.neonPink + '40',
+                borderColor: CafeTheme.colors.cat + '40',
               }}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -423,7 +423,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               marginLeft: onEdit ? 5 : 0,
               borderRadius: 12,
               elevation: 3,
-              shadowColor: CyberPunkTheme.colors.error,
+              shadowColor: CafeTheme.colors.error,
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.3,
               shadowRadius: 4,
@@ -438,14 +438,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             }}
           >
             <LinearGradient
-              colors={[CyberPunkTheme.colors.error, '#CC0000']}
+              colors={[CafeTheme.colors.error, '#CC0000']}
               style={{
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 borderRadius: 12,
                 alignItems: 'center',
                 borderWidth: 1,
-                borderColor: CyberPunkTheme.colors.error + '40',
+                borderColor: CafeTheme.colors.error + '40',
               }}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}

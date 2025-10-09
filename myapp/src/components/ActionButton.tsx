@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 import { AddIcon, UserIcon, SQLExportIcon } from './Icons';
 
 interface ActionButtonProps {
@@ -50,7 +50,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       {icon === '➕' && (
         <AddIcon 
           size={18} 
-          color={variant === 'secondary' ? CyberPunkTheme.colors.primary : CyberPunkTheme.colors.background} 
+          color={variant === 'secondary' ? CafeTheme.colors.primary : CafeTheme.colors.background} 
         />
       )}
       {icon === '👤' && (
@@ -59,9 +59,9 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       {icon === '🗃️' && (
         <SQLExportIcon 
           size={18} 
-          color={variant === 'secondary' ? CyberPunkTheme.colors.neonGreen : 
-                 variant === 'success' ? CyberPunkTheme.colors.background : 
-                 CyberPunkTheme.colors.background} 
+          color={variant === 'secondary' ? CafeTheme.colors.success : 
+                 variant === 'success' ? CafeTheme.colors.background : 
+                 CafeTheme.colors.background} 
         />
       )}
       <Text style={[getTextStyle(), { marginLeft: icon ? 6 : 0 }]}>
@@ -82,7 +82,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         activeOpacity={0.8}
       >
         <LinearGradient
-          colors={[CyberPunkTheme.colors.neonPink, CyberPunkTheme.colors.primary]}
+          colors={[CafeTheme.colors.cat, CafeTheme.colors.primary]}
           style={styles.primaryGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -105,7 +105,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         activeOpacity={0.8}
       >
         <LinearGradient
-          colors={[CyberPunkTheme.colors.neonGreen, CyberPunkTheme.colors.success]}
+          colors={[CafeTheme.colors.success, CafeTheme.colors.success]}
           style={styles.successGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -140,14 +140,14 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     elevation: 4,
-    shadowColor: CyberPunkTheme.colors.neonPink,
+    shadowColor: CafeTheme.colors.cat,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
   },
   primaryButton: {
-    backgroundColor: CyberPunkTheme.colors.primary,
-    borderColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: 'transparent',
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -164,8 +164,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dangerButton: {
-    backgroundColor: CyberPunkTheme.colors.error,
-    borderColor: CyberPunkTheme.colors.error,
+    backgroundColor: CafeTheme.colors.error,
+    borderColor: CafeTheme.colors.error,
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -173,8 +173,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   successButton: {
-    backgroundColor: CyberPunkTheme.colors.neonGreen,
-    borderColor: CyberPunkTheme.colors.neonGreen,
+    backgroundColor: CafeTheme.colors.success,
+    borderColor: CafeTheme.colors.success,
     borderWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -189,16 +189,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryText: {
-    color: CyberPunkTheme.colors.background,
+    color: CafeTheme.colors.background,
   },
   secondaryText: {
-    color: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.primary,
   },
   dangerText: {
     color: 'white',
   },
   successText: {
-    color: CyberPunkTheme.colors.background,
+    color: CafeTheme.colors.background,
   },
   primaryGradient: {
     paddingHorizontal: 16,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     flex: 1,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.neonPink + '60',
+    borderColor: CafeTheme.colors.cat + '60',
   },
   successGradient: {
     paddingHorizontal: 16,
@@ -222,6 +222,6 @@ const styles = StyleSheet.create({
     minHeight: 44,
     flex: 1,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.neonGreen + '60',
+    borderColor: CafeTheme.colors.success + '60',
   },
 });

@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { ProductFormData, Product } from '../types';
 import { LinearGradient } from 'expo-linear-gradient';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 import { AddIcon, EditIcon, ViewIcon, PackageIcon } from './Icons';
 
 interface ProductFormProps {
@@ -38,9 +38,9 @@ const categories = [
 ];
 
 const statuses = [
-  { id: 'active', name: 'ใช้งาน', icon: '✅', color: CyberPunkTheme.colors.success },
-  { id: 'inactive', name: 'ไม่ใช้งาน', icon: '⏸️', color: CyberPunkTheme.colors.warning },
-  { id: 'discontinued', name: 'ยกเลิก', icon: '❌', color: CyberPunkTheme.colors.error }
+  { id: 'active', name: 'ใช้งาน', icon: '✅', color: CafeTheme.colors.success },
+  { id: 'inactive', name: 'ไม่ใช้งาน', icon: '⏸️', color: CafeTheme.colors.warning },
+  { id: 'discontinued', name: 'ยกเลิก', icon: '❌', color: CafeTheme.colors.error }
 ];
 
 const units = [
@@ -166,21 +166,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         style={styles.modalOverlay}
       >
         <LinearGradient
-          colors={[CyberPunkTheme.colors.surface, CyberPunkTheme.colors.background]}
+          colors={[CafeTheme.colors.surface, CafeTheme.colors.background]}
           style={styles.modalContent}
         >
           <LinearGradient
-            colors={[CyberPunkTheme.colors.primary + '20', CyberPunkTheme.colors.primary + '10']}
+            colors={[CafeTheme.colors.primary + '20', CafeTheme.colors.primary + '10']}
             style={styles.header}
           >
             <View style={styles.headerContent}>
               <View style={styles.headerIcon}>
                 {mode === 'add' ? (
-                  <AddIcon size={24} color={CyberPunkTheme.colors.primary} />
+                  <AddIcon size={24} color={CafeTheme.colors.primary} />
                 ) : mode === 'edit' ? (
-                  <EditIcon size={24} color={CyberPunkTheme.colors.neonPink} />
+                  <EditIcon size={24} color={CafeTheme.colors.cat} />
                 ) : (
-                  <ViewIcon size={24} color={CyberPunkTheme.colors.textSecondary} />
+                  <ViewIcon size={24} color={CafeTheme.colors.textSecondary} />
                 )}
               </View>
               <Text style={styles.headerTitle}>
@@ -200,7 +200,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 value={formData.name}
                 onChangeText={(value) => mode !== 'view' && updateField('name', value)}
                 placeholder="กรอกชื่อสินค้า"
-                placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                placeholderTextColor={CafeTheme.colors.textSecondary}
                 editable={mode !== 'view'}
               />
             </View>
@@ -244,7 +244,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   onChangeText={(value) => mode !== 'view' && updateField('price', value)}
                   placeholder="0.00"
                   keyboardType="numeric"
-                  placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                  placeholderTextColor={CafeTheme.colors.textSecondary}
                   editable={mode !== 'view'}
                 />
               </View>
@@ -288,7 +288,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   onChangeText={(value) => mode !== 'view' && updateField('stock', value)}
                   placeholder="0"
                   keyboardType="numeric"
-                  placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                  placeholderTextColor={CafeTheme.colors.textSecondary}
                   editable={mode !== 'view'}
                 />
               </View>
@@ -299,7 +299,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   value={formData.location}
                   onChangeText={(value) => mode !== 'view' && updateField('location', value)}
                   placeholder="เช่น A-001"
-                  placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                  placeholderTextColor={CafeTheme.colors.textSecondary}
                   editable={mode !== 'view'}
                 />
               </View>
@@ -312,7 +312,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 value={formData.brand}
                 onChangeText={(value) => mode !== 'view' && updateField('brand', value)}
                 placeholder="กรอกชื่อแบรนด์"
-                placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                placeholderTextColor={CafeTheme.colors.textSecondary}
                 editable={mode !== 'view'}
               />
             </View>
@@ -324,7 +324,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 value={formData.sizes}
                 onChangeText={(value) => mode !== 'view' && updateField('sizes', value)}
                 placeholder="เช่น S, M, L หรือ 128GB, 256GB"
-                placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                placeholderTextColor={CafeTheme.colors.textSecondary}
                 editable={mode !== 'view'}
               />
             </View>
@@ -336,7 +336,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 value={formData.productCode}
                 onChangeText={(value) => mode !== 'view' && updateField('productCode', value)}
                 placeholder="เช่น IP15P-001"
-                placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                placeholderTextColor={CafeTheme.colors.textSecondary}
                 editable={mode !== 'view'}
               />
             </View>
@@ -348,7 +348,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 value={formData.orderName}
                 onChangeText={(value) => mode !== 'view' && updateField('orderName', value)}
                 placeholder="ชื่อสินค้าแบบย่อ"
-                placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                placeholderTextColor={CafeTheme.colors.textSecondary}
                 editable={mode !== 'view'}
               />
             </View>
@@ -360,7 +360,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 value={formData.image}
                 onChangeText={(value) => mode !== 'view' && updateField('image', value)}
                 placeholder="https://example.com/image.jpg"
-                placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+                placeholderTextColor={CafeTheme.colors.textSecondary}
                 editable={mode !== 'view'}
               />
             </View>
@@ -394,7 +394,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           </ScrollView>
 
           <LinearGradient
-            colors={[CyberPunkTheme.colors.primary, CyberPunkTheme.colors.primary + '80']}
+            colors={[CafeTheme.colors.primary, CafeTheme.colors.primary + '80']}
             style={styles.buttonContainer}
           >
             <TouchableOpacity
@@ -460,9 +460,9 @@ const styles = StyleSheet.create({
     width: '92%',
     maxHeight: '90%',
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     elevation: 10,
-    shadowColor: CyberPunkTheme.colors.primary,
+    shadowColor: CafeTheme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     borderBottomWidth: 1,
-    borderBottomColor: CyberPunkTheme.colors.primary + '30',
+    borderBottomColor: CafeTheme.colors.primary + '30',
   },
   headerContent: {
     flexDirection: 'row',
@@ -489,13 +489,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
   },
   closeButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: CyberPunkTheme.colors.error,
+    backgroundColor: CafeTheme.colors.error,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
@@ -515,25 +515,25 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '700',
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
     marginBottom: 12,
-    textShadowColor: CyberPunkTheme.colors.primary + '30',
+    textShadowColor: CafeTheme.colors.primary + '30',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   input: {
-    backgroundColor: CyberPunkTheme.colors.background,
+    backgroundColor: CafeTheme.colors.background,
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.surfaceLight,
+    borderColor: CafeTheme.colors.surfaceLight,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
     elevation: 2,
   },
   disabledInput: {
-    backgroundColor: CyberPunkTheme.colors.surfaceLight,
-    borderColor: CyberPunkTheme.colors.textSecondary,
+    backgroundColor: CafeTheme.colors.surfaceLight,
+    borderColor: CafeTheme.colors.textSecondary,
     opacity: 0.7,
   },
   row: {
@@ -556,17 +556,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
-    backgroundColor: CyberPunkTheme.colors.background,
+    backgroundColor: CafeTheme.colors.background,
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.surfaceLight,
+    borderColor: CafeTheme.colors.surfaceLight,
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 2,
     minWidth: 120,
   },
   pickerOptionSelected: {
-    backgroundColor: CyberPunkTheme.colors.primary,
-    borderColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     elevation: 4,
   },
   pickerIcon: {
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
   },
   pickerOptionText: {
     fontSize: 14,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '600',
   },
   pickerOptionTextSelected: {
@@ -591,17 +591,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
-    backgroundColor: CyberPunkTheme.colors.background,
+    backgroundColor: CafeTheme.colors.background,
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.surfaceLight,
+    borderColor: CafeTheme.colors.surfaceLight,
     flexDirection: 'row',
     alignItems: 'center',
     elevation: 2,
     minWidth: 80,
   },
   unitOptionSelected: {
-    backgroundColor: CyberPunkTheme.colors.primary,
-    borderColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     elevation: 4,
   },
   unitIcon: {
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
   },
   unitOptionText: {
     fontSize: 12,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '600',
   },
   unitOptionTextSelected: {
@@ -625,15 +625,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: CyberPunkTheme.colors.background,
+    backgroundColor: CafeTheme.colors.background,
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.surfaceLight,
+    borderColor: CafeTheme.colors.surfaceLight,
     alignItems: 'center',
     elevation: 2,
   },
   statusOptionSelected: {
-    backgroundColor: CyberPunkTheme.colors.primary,
-    borderColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     elevation: 4,
   },
   statusIcon: {
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
   },
   statusOptionText: {
     fontSize: 14,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '600',
   },
   statusOptionTextSelected: {
@@ -656,33 +656,33 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 18,
     borderTopWidth: 1,
-    borderTopColor: CyberPunkTheme.colors.primary + '30',
+    borderTopColor: CafeTheme.colors.primary + '30',
   },
   cancelButton: {
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: CyberPunkTheme.colors.surface,
+    backgroundColor: CafeTheme.colors.surface,
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.surfaceLight,
+    borderColor: CafeTheme.colors.surfaceLight,
     alignItems: 'center',
     elevation: 3,
   },
   cancelButtonText: {
     fontSize: 16,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '600',
   },
   submitButton: {
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
     alignItems: 'center',
     elevation: 4,
   },
   submitButtonEdit: {
-    backgroundColor: CyberPunkTheme.colors.neonGreen,
+    backgroundColor: CafeTheme.colors.success,
   },
   submitButtonDisabled: {
     opacity: 0.6,

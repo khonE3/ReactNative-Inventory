@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing, TouchableOpacity } from 'react-native';
 import { inventoryStyles } from '../styles/inventory';
-import { CyberPunkTheme } from '../constants';
+import { CafeTheme } from '../constants';
 import { Product } from '../types';
 
 interface InventoryHeaderProps {
@@ -12,6 +12,7 @@ interface InventoryHeaderProps {
   lastUpdated: string;
   products?: Product[]; // เพิ่มเพื่อส่งให้ PDF Export
   onRefresh?: () => void;
+  onLogout?: () => void; // เพิ่ม callback สำหรับ logout
 }
 
 export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
@@ -21,7 +22,8 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
   totalValue,
   lastUpdated,
   products = [],
-  onRefresh
+  onRefresh,
+  onLogout
 }) => {
   // Animation values
   const glowAnimation = useRef(new Animated.Value(0)).current;
@@ -130,9 +132,21 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
               opacity: titleAnimation
             }
           ]}>
-              ​​Inventory Management System
+            🐱☕ Inventory Management System
           </Animated.Text>
         </View>
+        
+        {/* Logout Button */}
+        {onLogout && (
+          <TouchableOpacity 
+            style={styles.logoutButton}
+            onPress={onLogout}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.logoutIcon}>🚪</Text>
+            <Text style={styles.logoutText}>ออกจากระบบ</Text>
+          </TouchableOpacity>
+        )}
       </View>
       
       <View style={inventoryStyles.statsContainer}>
@@ -150,7 +164,7 @@ export const InventoryHeader: React.FC<InventoryHeaderProps> = ({
           <Text style={[
             inventoryStyles.statValue, 
             styles.statValueGlow,
-            { color: lowStockProducts > 0 ? CyberPunkTheme.colors.error : CyberPunkTheme.colors.success }
+            { color: lowStockProducts > 0 ? CafeTheme.colors.error : CafeTheme.colors.success }
           ]}>
             {lowStockProducts > 0 ? '⚠️' : '✨'} {lowStockProducts}
           </Text>
@@ -183,6 +197,27 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 20,
   },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: CafeTheme.colors.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: CafeTheme.borderRadius.xl,
+    borderWidth: 2,
+    borderColor: CafeTheme.colors.error,
+    ...CafeTheme.shadows.cute,
+    shadowColor: CafeTheme.colors.error,
+  },
+  logoutIcon: {
+    fontSize: 20,
+    marginRight: 6,
+  },
+  logoutText: {
+    color: CafeTheme.colors.error,
+    fontSize: 14,
+    fontWeight: CafeTheme.typography.weights.bold,
+  },
   lastUpdatedContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -192,16 +227,16 @@ const styles = StyleSheet.create({
   lastUpdatedDivider: {
     flex: 1,
     height: 1,
-    backgroundColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
     opacity: 0.3,
     marginHorizontal: 12,
   },
   lastUpdatedText: {
     fontSize: 12,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '600',
     letterSpacing: 0.5,
-    textShadowColor: CyberPunkTheme.colors.textSecondary,
+    textShadowColor: CafeTheme.colors.textSecondary,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 4,
     paddingHorizontal: 8,
@@ -228,7 +263,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 0, 0.4)',
   },
   statValueGlow: {
-    textShadowColor: CyberPunkTheme.colors.primary,
+    textShadowColor: CafeTheme.colors.primary,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 12,
   },

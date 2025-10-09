@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 import { ExportService } from '../services/exportService';
 import { Product } from '../types';
 
@@ -43,7 +43,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       style={{
         borderRadius: 12,
         elevation: 3,
-        shadowColor: CyberPunkTheme.colors.neonGreen,
+        shadowColor: CafeTheme.colors.success,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -51,14 +51,14 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       }}
     >
       <LinearGradient
-        colors={[CyberPunkTheme.colors.neonGreen, CyberPunkTheme.colors.success]}
+        colors={[CafeTheme.colors.success, CafeTheme.colors.success]}
         style={{
           paddingHorizontal: 16,
           paddingVertical: 12,
           borderRadius: 12,
           alignItems: 'center',
           borderWidth: 1,
-          borderColor: CyberPunkTheme.colors.neonGreen + '40',
+          borderColor: CafeTheme.colors.success + '40',
           minWidth: 120,
         }}
         start={{ x: 0, y: 0 }}
@@ -68,11 +68,11 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
           <Ionicons 
             name="download-outline" 
             size={18} 
-            color={CyberPunkTheme.colors.background}
+            color={CafeTheme.colors.background}
             style={{ marginRight: 8 }}
           />
           <Text style={{
-            color: CyberPunkTheme.colors.background,
+            color: CafeTheme.colors.background,
             fontSize: 14,
             fontWeight: '600',
           }}>

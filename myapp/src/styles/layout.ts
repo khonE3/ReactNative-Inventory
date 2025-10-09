@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 
-const { colors, spacing, radius } = CyberPunkTheme;
+const { colors, spacing, radius } = CafeTheme;
 
 export const layoutStyles = StyleSheet.create({
   container: {

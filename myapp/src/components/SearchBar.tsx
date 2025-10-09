@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text } from 'react-native';
 import { inventoryStyles } from '../styles/inventory';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -22,16 +22,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         style={[
           inventoryStyles.searchInput,
           isFocused && {
-            borderColor: CyberPunkTheme.colors.primaryLight,
-            shadowColor: CyberPunkTheme.colors.primary,
+            borderColor: CafeTheme.colors.cat,
+            shadowColor: CafeTheme.colors.primary,
             shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.5,
-            shadowRadius: 10,
-            elevation: 5,
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 4,
           }
         ]}
         placeholder="🔍 ค้นหาสินค้า รหัส หรือหมวดหมู่..."
-        placeholderTextColor={CyberPunkTheme.colors.textSecondary}
+        placeholderTextColor={CafeTheme.colors.textSecondary}
         value={searchQuery}
         onChangeText={onSearchChange}
         onFocus={() => setIsFocused(true)}
@@ -45,7 +45,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onPress={onFilterPress}
           activeOpacity={0.8}
         >
-          <Text style={{ color: CyberPunkTheme.colors.primary, fontSize: 18 }}>
+          <Text style={{ color: CafeTheme.colors.primary, fontSize: 18 }}>
             🎛️
           </Text>
         </TouchableOpacity>

@@ -1,26 +1,26 @@
 import { StyleSheet, Dimensions } from 'react-native';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 
 const { width } = Dimensions.get('window');
 
 export const inventoryStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: CyberPunkTheme.colors.background,
+    backgroundColor: CafeTheme.colors.background,
   },
   
   // Header Styles - Enhanced Cyberpunk Design
   header: {
-    backgroundColor: CyberPunkTheme.colors.surface,
+    backgroundColor: CafeTheme.colors.surface,
     borderWidth: 2,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderRadius: 16,
     margin: 16,
     padding: 24,
     position: 'relative',
     overflow: 'hidden',
     // Enhanced shadow for depth
-    shadowColor: CyberPunkTheme.colors.primary,
+    shadowColor: CafeTheme.colors.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
@@ -32,7 +32,7 @@ export const inventoryStyles = StyleSheet.create({
     left: -2,
     right: -2,
     bottom: -2,
-    backgroundColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
     opacity: 0.15,
     borderRadius: 18,
   },
@@ -43,7 +43,7 @@ export const inventoryStyles = StyleSheet.create({
     left: 2,
     right: 2,
     bottom: 2,
-    backgroundColor: CyberPunkTheme.colors.neonPink,
+    backgroundColor: CafeTheme.colors.cat,
     opacity: 0.05,
     borderRadius: 14,
   },
@@ -54,23 +54,23 @@ export const inventoryStyles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primaryLight,
+    borderColor: CafeTheme.colors.primaryLight,
     borderRadius: 16,
     opacity: 0.6,
   },
   headerTitle: {
     fontSize: 26,
     fontWeight: '900',
-    color: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.primary,
     textAlign: 'center',
     marginBottom: 12,
     letterSpacing: 1.5,
     // Enhanced text shadow effect
-    textShadowColor: CyberPunkTheme.colors.primary,
+    textShadowColor: CafeTheme.colors.primary,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 15,
     // Additional shadow layers
-    textDecorationColor: CyberPunkTheme.colors.primaryLight,
+    textDecorationColor: CafeTheme.colors.primaryLight,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -90,7 +90,7 @@ export const inventoryStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0, 255, 255, 0.2)',
     // Enhanced shadow for stat cards
-    shadowColor: CyberPunkTheme.colors.primary,
+    shadowColor: CafeTheme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -99,20 +99,20 @@ export const inventoryStyles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '800',
-    color: CyberPunkTheme.colors.textPrimary,
-    textShadowColor: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.textPrimary,
+    textShadowColor: CafeTheme.colors.primary,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 8,
     letterSpacing: 0.5,
   },
   statLabel: {
     fontSize: 11,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     marginTop: 4,
     textAlign: 'center',
     fontWeight: '600',
     letterSpacing: 0.3,
-    textShadowColor: CyberPunkTheme.colors.textSecondary,
+    textShadowColor: CafeTheme.colors.textSecondary,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 4,
   },
@@ -126,19 +126,19 @@ export const inventoryStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: CyberPunkTheme.colors.surface,
+    backgroundColor: CafeTheme.colors.surface,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
     fontSize: 16,
   },
   filterButton: {
-    backgroundColor: CyberPunkTheme.colors.surface,
+    backgroundColor: CafeTheme.colors.surface,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderRadius: 8,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -155,9 +155,9 @@ export const inventoryStyles = StyleSheet.create({
     paddingVertical: 5,
   },
   categoryButton: {
-    backgroundColor: CyberPunkTheme.colors.surface,
+    backgroundColor: CafeTheme.colors.surface,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 8,
@@ -165,29 +165,29 @@ export const inventoryStyles = StyleSheet.create({
     opacity: 0.7,
   },
   categoryButtonActive: {
-    backgroundColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
     opacity: 1,
-    shadowColor: CyberPunkTheme.colors.primary,
+    shadowColor: CafeTheme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 10,
     elevation: 5,
   },
   categoryFilter: {
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
     fontSize: 14,
     fontWeight: '500',
   },
   categoryTextActive: {
-    color: CyberPunkTheme.colors.background,
+    color: CafeTheme.colors.background,
     fontWeight: 'bold',
   },
 
   // Product Card Styles
   productCard: {
-    backgroundColor: CyberPunkTheme.colors.surface,
+    backgroundColor: CafeTheme.colors.surface,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderRadius: 12,
     margin: 4,
     padding: 12,
@@ -202,7 +202,7 @@ export const inventoryStyles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
     opacity: 0.05,
     borderRadius: 12,
   },
@@ -217,20 +217,20 @@ export const inventoryStyles = StyleSheet.create({
     height: 80,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
   },
   productImagePlaceholder: {
     width: 80,
     height: 80,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
-    backgroundColor: CyberPunkTheme.colors.background,
+    borderColor: CafeTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
   placeholderText: {
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontSize: 24,
   },
   
@@ -241,21 +241,21 @@ export const inventoryStyles = StyleSheet.create({
   productName: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
     marginBottom: 4,
     textAlign: 'center',
     minHeight: 32,
   },
   productCode: {
     fontSize: 10,
-    color: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.primary,
     textAlign: 'center',
     marginBottom: 6,
   },
   
   // Category Badge
   categoryBadge: {
-    backgroundColor: CyberPunkTheme.colors.primary,
+    backgroundColor: CafeTheme.colors.primary,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,
@@ -263,7 +263,7 @@ export const inventoryStyles = StyleSheet.create({
   },
   categoryText: {
     fontSize: 10,
-    color: CyberPunkTheme.colors.background,
+    color: CafeTheme.colors.background,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -276,7 +276,7 @@ export const inventoryStyles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: CyberPunkTheme.colors.primary,
+    borderTopColor: CafeTheme.colors.primary,
   },
   priceSection: {
     alignItems: 'flex-start',
@@ -284,11 +284,11 @@ export const inventoryStyles = StyleSheet.create({
   productPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.primary,
   },
   productUnit: {
     fontSize: 10,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
   },
   stockSection: {
     alignItems: 'flex-end',
@@ -299,7 +299,7 @@ export const inventoryStyles = StyleSheet.create({
   },
   stockLabel: {
     fontSize: 10,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
   },
   
   // Additional Info
@@ -309,15 +309,15 @@ export const inventoryStyles = StyleSheet.create({
     marginTop: 6,
     paddingTop: 6,
     borderTopWidth: 0.5,
-    borderTopColor: CyberPunkTheme.colors.primary + '30',
+    borderTopColor: CafeTheme.colors.primary + '30',
   },
   locationText: {
     fontSize: 9,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
   },
   brandText: {
     fontSize: 9,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
   },
   
   // Low Stock Warning
@@ -345,13 +345,13 @@ export const inventoryStyles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     textAlign: 'center',
     marginTop: 20,
   },
   emptySubtext: {
     fontSize: 14,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     textAlign: 'center',
     marginTop: 10,
     opacity: 0.7,
@@ -391,9 +391,9 @@ export const inventoryStyles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: CyberPunkTheme.colors.glass,
+    backgroundColor: CafeTheme.colors.glass,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -404,9 +404,9 @@ export const inventoryStyles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: CyberPunkTheme.colors.glass,
+    backgroundColor: CafeTheme.colors.glass,
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.error,
+    borderColor: CafeTheme.colors.error,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -419,7 +419,7 @@ export const inventoryStyles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: CyberPunkTheme.colors.primaryDark,
+    borderTopColor: CafeTheme.colors.primaryDark,
   },
   statusInfo: {
     flexDirection: 'row',
@@ -429,13 +429,13 @@ export const inventoryStyles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 11,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '500',
   },
   statusValue: {
     fontSize: 11,
     fontWeight: 'bold',
-    textShadowColor: CyberPunkTheme.colors.primary,
+    textShadowColor: CafeTheme.colors.primary,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 3,
   },
@@ -446,12 +446,12 @@ export const inventoryStyles = StyleSheet.create({
   },
   updateLabel: {
     fontSize: 10,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontWeight: '500',
   },
   updateValue: {
     fontSize: 10,
-    color: CyberPunkTheme.colors.textSecondary,
+    color: CafeTheme.colors.textSecondary,
     fontStyle: 'italic',
   },
 });

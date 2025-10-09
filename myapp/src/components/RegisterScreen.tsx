@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 import { authService } from '../services/auth';
 
 interface RegisterScreenProps {
@@ -82,7 +82,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                 value={username}
                 onChangeText={setUsername}
                 placeholder="กรอกชื่อผู้ใช้"
-                placeholderTextColor={CyberPunkTheme.colors.textMuted}
+                placeholderTextColor={CafeTheme.colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -95,7 +95,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                 value={password}
                 onChangeText={setPassword}
                 placeholder="กรอกรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
-                placeholderTextColor={CyberPunkTheme.colors.textMuted}
+                placeholderTextColor={CafeTheme.colors.textMuted}
                 secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -109,7 +109,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 placeholder="กรอกรหัสผ่านอีกครั้ง"
-                placeholderTextColor={CyberPunkTheme.colors.textMuted}
+                placeholderTextColor={CafeTheme.colors.textMuted}
                 secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -122,7 +122,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
               disabled={isLoading}
             >
               {isLoading ? (
-                <ActivityIndicator color={CyberPunkTheme.colors.background} />
+                <ActivityIndicator color={CafeTheme.colors.background} />
               ) : (
                 <Text style={styles.registerButtonText}>สร้างบัญชี</Text>
               )}
@@ -146,7 +146,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: CyberPunkTheme.colors.background,
+    backgroundColor: CafeTheme.colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -164,12 +164,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.primary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: CyberPunkTheme.colors.textMuted,
+    color: CafeTheme.colors.textMuted,
   },
   form: {
     width: '100%',
@@ -180,21 +180,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: CyberPunkTheme.colors.textPrimary,
+    color: CafeTheme.colors.textPrimary,
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: CyberPunkTheme.colors.primary,
+    borderColor: CafeTheme.colors.primary,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: CyberPunkTheme.colors.textPrimary,
-    backgroundColor: CyberPunkTheme.colors.surface,
+    color: CafeTheme.colors.textPrimary,
+    backgroundColor: CafeTheme.colors.surface,
   },
   registerButton: {
-    backgroundColor: CyberPunkTheme.colors.neonGreen,
+    backgroundColor: CafeTheme.colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   registerButtonText: {
-    color: CyberPunkTheme.colors.background,
+    color: CafeTheme.colors.background,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -213,11 +213,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchButtonText: {
-    color: CyberPunkTheme.colors.textMuted,
+    color: CafeTheme.colors.textMuted,
     fontSize: 14,
   },
   switchButtonTextHighlight: {
-    color: CyberPunkTheme.colors.primary,
+    color: CafeTheme.colors.primary,
     fontWeight: '600',
   },
 });

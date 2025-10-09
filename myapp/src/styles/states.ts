@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { CyberPunkTheme } from '../constants/theme';
+import { CafeTheme } from '../constants/cafeTheme';
 
-const { colors, spacing, radius, shadows, typography } = CyberPunkTheme;
+const { colors, spacing, borderRadius, shadows, typography } = CafeTheme;
 
 export const stateStyles = StyleSheet.create({
   loadingContainer: {
@@ -52,7 +52,7 @@ export const stateStyles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing['5xl'],
     backgroundColor: colors.surface,
-    borderRadius: radius['2xl'],
+    borderRadius: borderRadius['2xl'],
     marginHorizontal: spacing.md,
     borderWidth: 1,
     borderColor: colors.glass,

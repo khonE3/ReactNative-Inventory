@@ -1,4 +1,4 @@
-export { CyberPunkBackground } from './CyberPunkBackground';
+export { CyberPunkBackground } from './CafeBackground';
 export { LoadingScreen, ErrorScreen, EmptyState } from './StateComponents';
 export { UserIcon, MailIcon, PhoneIcon, LocationIcon, CompanyIcon, SQLExportIcon } from './Icons';
 

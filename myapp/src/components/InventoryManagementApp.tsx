@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { LoadingScreen, ErrorScreen } from './StateComponents';
-import { CyberPunkBackground } from './CyberPunkBackground';
+import { CyberPunkBackground } from './CafeBackground';
 import { ProductCard } from './ProductCard';
 import { InventoryHeader } from './InventoryHeader';
 import { CategoryFilter } from './CategoryFilter';
@@ -20,7 +20,7 @@ import { ActionButton } from './ActionButton';
 import { layoutStyles, inventoryStyles } from '../styles';
 import { useInventoryData } from '../hooks/useInventoryData';
 import { useAuth } from '../hooks/useAuth';
-import { CyberPunkTheme } from '../constants';
+import { CafeTheme } from '../constants';
 import { Product, ProductFormData } from '../types';
 
 export const InventoryManagementApp = () => {
@@ -189,9 +189,9 @@ export const InventoryManagementApp = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={[layoutStyles.container, { backgroundColor: CyberPunkTheme.colors.background }]}>
+      <SafeAreaView style={[layoutStyles.container, { backgroundColor: CafeTheme.colors.background }]}>
         <CyberPunkBackground />
-        <StatusBar barStyle="light-content" backgroundColor={CyberPunkTheme.colors.background} />
+        <StatusBar barStyle="dark-content" backgroundColor={CafeTheme.colors.background} />
         <LoadingScreen />
       </SafeAreaView>
     );
@@ -199,9 +199,9 @@ export const InventoryManagementApp = () => {
 
   if (error) {
     return (
-      <SafeAreaView style={[layoutStyles.container, { backgroundColor: CyberPunkTheme.colors.background }]}>
+      <SafeAreaView style={[layoutStyles.container, { backgroundColor: CafeTheme.colors.background }]}>
         <CyberPunkBackground />
-        <StatusBar barStyle="light-content" backgroundColor={CyberPunkTheme.colors.background} />
+        <StatusBar barStyle="dark-content" backgroundColor={CafeTheme.colors.background} />
         <ErrorScreen error={error} onRetry={() => fetchData()} />
       </SafeAreaView>
     );
@@ -211,9 +211,9 @@ export const InventoryManagementApp = () => {
   console.log('🎯 handleDeleteProduct is:', typeof handleDeleteProduct);
 
   return (
-    <SafeAreaView style={[layoutStyles.container, { backgroundColor: CyberPunkTheme.colors.background }]}>
+    <SafeAreaView style={[layoutStyles.container, { backgroundColor: CafeTheme.colors.background }]}>
       <CyberPunkBackground />
-      <StatusBar barStyle="light-content" backgroundColor={CyberPunkTheme.colors.background} />
+      <StatusBar barStyle="dark-content" backgroundColor={CafeTheme.colors.background} />
       
       <FlatList
         ListHeaderComponent={
@@ -226,6 +226,7 @@ export const InventoryManagementApp = () => {
               lastUpdated={lastUpdated}
               products={products}
               onRefresh={onRefresh}
+              onLogout={logout}
             />
             
             <SearchBar
@@ -296,10 +297,10 @@ export const InventoryManagementApp = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[CyberPunkTheme.colors.primary]}
-            tintColor={CyberPunkTheme.colors.primary}
+            colors={[CafeTheme.colors.primary]}
+            tintColor={CafeTheme.colors.primary}
             title="กำลังซิงค์สินค้าไซเบอร์... ⚡"
-            titleColor={CyberPunkTheme.colors.textPrimary}
+            titleColor={CafeTheme.colors.textPrimary}
           />
         }
         ListEmptyComponent={
