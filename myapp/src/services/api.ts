@@ -1,9 +1,9 @@
 import { Product } from '../types';
 import { authService } from './auth';
 
-// Using production server IP address for React Native compatibility
-const BACKEND_URL = 'http://119.59.102.61:3006'; 
-const BASE_URL = 'http://nindam.sytes.net/std6630202015/Inventory';
+// Using production server (backend running on nindam.sytes.net)
+const BACKEND_URL = 'http://nindam.sytes.net:3018';
+const BASE_URL = 'http://nindam.sytes.net/std6630202252/Inventory';
 
 // Helper function to get headers with auth token
 const getHeaders = async (): Promise<HeadersInit> => {

@@ -34,6 +34,15 @@ const pool = mysql.createPool({
     conn.release();
   } catch (err) {
     console.error('⚠️  MySQL connection failed on boot:', err.message);
+    console.error('❌ Error code:', err.code);
+    console.error('❌ Error errno:', err.errno);
+    console.error('🔧 Connection config:', {
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      database: process.env.DB_NAME,
+      port: process.env.DB_PORT,
+      hasPassword: !!process.env.DB_PASSWORD
+    });
   }
 })();
 
@@ -494,40 +503,11 @@ app.get('/api/products/category/:category', authToken, async (req, res) => {
 // GET /api/products (fetch all products)
 app.get('/api/products', authToken, async (req, res) => {
   try {
-    const [rows] = await pool.query(`
-      SELECT 
-        id, 
-        name, 
-        category, 
-        price, 
-        unit, 
-        image, 
-        stock, 
-        location, 
-        status, 
-        brand, 
-        sizes,
-        productCode,
-        orderName,
-        lastUpdate
-      FROM products 
-      ORDER BY lastUpdate DESC
-    `);
-    
-    // Ensure price and stock are numbers
-    const products = rows.map(product => ({
-      ...product,
-      price: parseFloat(product.price) || 0,
-      stock: parseInt(product.stock) || 0,
-      // Add default storeAvailability for frontend compatibility
-      storeAvailability: []
-    }));
-    
-    console.log(`✅ Fetched ${products.length} products successfully`);
-    return res.json(products);
-  } catch (e) {
-    console.error('Products Error:', e);
-    return res.status(500).json({ error: 'Failed to fetch products' });
+    const [rows] = await pool.query('SELECT * FROM products ORDER BY id DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching products:', error.message);
+    res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
 

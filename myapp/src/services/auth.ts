@@ -2,12 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LoginCredentials, AuthResponse } from '../types';
 import { mockAuthService } from './mockAuth';
 
-const BACKEND_URL = 'http://119.59.102.61:3006';
+const BACKEND_URL = 'http://nindam.sytes.net:3018'; // Production server
 const TOKEN_KEY = 'inventory_auth_token';
 const USER_KEY = 'inventory_user';
 
 // Use mock authentication but with valid backend token
-const USE_MOCK_AUTH = true;
+const USE_MOCK_AUTH = false; // ✅ เปลี่ยนเป็น false เพื่อใช้ Backend จริง
 
 export const authService = {
   async initialize(): Promise<void> {
