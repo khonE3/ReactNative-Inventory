@@ -7,7 +7,8 @@ import {
   getUniqueCategories,
   createProduct,
   updateProduct as updateProductAPI,
-  deleteProduct as deleteProductAPI
+  deleteProduct as deleteProductAPI,
+  fetchStatistics
 } from '../services/api';
 
 export const useInventoryData = () => {
@@ -20,6 +21,12 @@ export const useInventoryData = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [statistics, setStatistics] = useState({
+    totalProducts: 0,
+    activeProducts: 0,
+    lowStockProducts: 0,
+    totalValue: 0,
+  });
 
   // Validate and clean product data
   const validateProduct = (product: any): Product => {
@@ -62,9 +69,33 @@ export const useInventoryData = () => {
     };
   };
 
+  // Helper function to calculate statistics from products
+  const calculateStatsFromProducts = (productList: Product[]) => {
+    const totalProducts = productList.length;
+    const activeProducts = productList.filter(p => p.status?.toLowerCase() === 'active').length;
+    const lowStockProducts = productList.filter(p => {
+      const stock = typeof p.stock === 'number' ? p.stock : parseInt(p.stock) || 0;
+      return stock < 10;
+    }).length;
+    const totalValue = productList.reduce((sum, p) => {
+      const price = typeof p.price === 'number' ? p.price : parseFloat(p.price) || 0;
+      const stock = typeof p.stock === 'number' ? p.stock : parseInt(p.stock) || 0;
+      return sum + (price * stock);
+    }, 0);
+    
+    return {
+      totalProducts,
+      activeProducts,
+      lowStockProducts,
+      totalValue,
+    };
+  };
+
   const fetchData = useCallback(async () => {
     try {
       setError(null);
+      
+      // Fetch products
       const data = await fetchProducts();
       console.log('Fetched products data:', data); // Debug log
       
@@ -89,6 +120,25 @@ export const useInventoryData = () => {
       setProducts(validatedProducts);
       setFilteredProducts(validatedProducts);
       setCategories(getUniqueCategories(validatedProducts));
+      
+      // Fetch real-time statistics from backend
+      const stats = await fetchStatistics();
+      if (stats) {
+        // Use backend statistics
+        console.log('Using backend statistics:', stats);
+        setStatistics({
+          totalProducts: stats.totalProducts || 0,
+          activeProducts: stats.activeProducts || 0,
+          lowStockProducts: stats.lowStockProducts || 0,
+          totalValue: stats.totalValue || 0,
+        });
+      } else {
+        // Fallback: Calculate from products
+        console.log('Calculating statistics from products...');
+        const calculatedStats = calculateStatsFromProducts(validatedProducts);
+        setStatistics(calculatedStats);
+      }
+      
       setLastUpdated(new Date().toLocaleString('th-TH', {
         timeZone: 'Asia/Bangkok',
         year: 'numeric',
@@ -137,18 +187,9 @@ export const useInventoryData = () => {
   }, [products]);
 
   const getStockStatistics = useCallback(() => {
-    const totalProducts = products.length;
-    const activeProducts = getProductsByStatus('Active').length;
-    const lowStockProducts = getLowStockProducts().length;
-    const totalValue = getTotalInventoryValue();
-    
-    return {
-      totalProducts,
-      activeProducts,
-      lowStockProducts,
-      totalValue,
-    };
-  }, [products, getProductsByStatus, getLowStockProducts, getTotalInventoryValue]);
+    // Return real-time statistics from state (updated from backend)
+    return statistics;
+  }, [statistics]);
 
   // Product CRUD operations
   const addProduct = useCallback(async (productData: ProductFormData) => {

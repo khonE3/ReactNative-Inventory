@@ -511,6 +511,48 @@ app.get('/api/products', authToken, async (req, res) => {
   }
 });
 
+// GET /api/statistics (fetch real-time statistics)
+app.get('/api/statistics', authToken, async (req, res) => {
+  try {
+    console.log('📊 Fetching real-time statistics...');
+    
+    // Get total products count
+    const [totalResult] = await pool.query('SELECT COUNT(*) as count FROM products');
+    const totalProducts = totalResult[0].count;
+    
+    // Get active products count
+    const [activeResult] = await pool.query(
+      "SELECT COUNT(*) as count FROM products WHERE LOWER(status) = 'active'"
+    );
+    const activeProducts = activeResult[0].count;
+    
+    // Get low stock products count (stock < 10)
+    const [lowStockResult] = await pool.query(
+      'SELECT COUNT(*) as count FROM products WHERE stock < 10'
+    );
+    const lowStockProducts = lowStockResult[0].count;
+    
+    // Get total inventory value (price * stock)
+    const [valueResult] = await pool.query(
+      'SELECT SUM(price * stock) as totalValue FROM products'
+    );
+    const totalValue = parseFloat(valueResult[0].totalValue) || 0;
+    
+    const statistics = {
+      totalProducts,
+      activeProducts,
+      lowStockProducts,
+      totalValue: Math.round(totalValue * 100) / 100, // Round to 2 decimal places
+    };
+    
+    console.log('✅ Statistics fetched:', statistics);
+    res.json(statistics);
+  } catch (error) {
+    console.error('❌ Error fetching statistics:', error.message);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
+  }
+});
+
 // GET /api/products/:id (ดึงข้อมูลสินค้าตัวเดียว)
 app.get('/api/products/:id', authToken, async (req, res) => {
   try {

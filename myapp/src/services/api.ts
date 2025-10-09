@@ -75,6 +75,36 @@ export const getUniqueCategories = (products: Product[]): string[] => {
   return ['ทั้งหมด', ...Array.from(new Set(categories))];
 };
 
+// Get real-time statistics from backend
+export const fetchStatistics = async () => {
+  try {
+    console.log('📊 Fetching statistics from:', `${BACKEND_URL}/api/statistics`);
+    const headers = await getHeaders();
+    const response = await fetch(`${BACKEND_URL}/api/statistics`, {
+      headers,
+    });
+    
+    console.log('📊 Statistics response status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.error('❌ Authentication required for statistics');
+        throw new Error('Authentication required. Please login again.');
+      }
+      // If endpoint doesn't exist, calculate from products
+      console.warn('⚠️ Statistics endpoint not available (status:', response.status, '), will calculate from products');
+      return null;
+    }
+    
+    const stats = await response.json();
+    console.log('✅ Statistics fetched from backend:', JSON.stringify(stats, null, 2));
+    return stats;
+  } catch (error) {
+    console.error('❌ Statistics API Error:', error);
+    return null;
+  }
+};
+
 // CRUD Operations for Products
 export const createProduct = async (productData: Partial<Product>): Promise<Product> => {
   try {
